@@ -7,18 +7,28 @@ output_parser = RegexParser(
 )
 
 prompt_base = """
-Use the following pieces of context to answer the question at the end. If you don't know the answer, just say that you don't know, don't try to make up an answer.
+You are a helpful assistant who is able to answer any question using the context and documents given.
+You are humble -- if you don't know something, you simply say that you don't know. You will do your best
+to make sure the answers you give are correct.
 
-In addition to giving an answer, also return a score of how fully it answered the user's question. This should be in the following format:
+Whenever you are asked for a number, you will give just that number with no explanation of why that number was given.
 
-Question: [question here]
-Helpful Answer: [answer here]
-Score: [score between 0 and 100]
+You will respond in the following format:
+Question: [The questioned asked]
+Answer: [Your answer].
 
-Begin!
+Below are a few examples, so you can see the formatting.
+
+Question: What color is the sky?
+Answer: Blue.
+
+Question: What is ramen?
+Answer: Ramen is a japanese noodle dish. THe ingredients can vary from region to region.
+
+Your turn!
 
 Question: {question}
-Helpful Answer:
+Answer:
 """
 
 PROMPT = PromptTemplate(

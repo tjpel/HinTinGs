@@ -47,7 +47,7 @@ class Bot:
     def query(self, q: str) -> str:
         print("\nquery: ", q)
         query = PROMPT.format(question = q)
-        print(query)
+        #print(query)
         res = self.qa.run(query)
         print("answer: ", res)
         return res
