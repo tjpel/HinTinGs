@@ -17,16 +17,12 @@ Score: [score between 0 and 100]
 
 Begin!
 
-Context:
----------
-{context}
----------
 Question: {question}
 Helpful Answer:
 """
 
 PROMPT = PromptTemplate(
     template=prompt_base,
-    input_variables=["context", "question"],
-    output_parser=output_parser,
+    input_variables=["question"],
+    output_parser=output_parser
 )

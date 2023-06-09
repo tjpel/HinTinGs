@@ -36,17 +36,18 @@ class Bot:
         docsearch = Chroma.from_documents(texts, embeddings)
 
         llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0)
-        chain_type_kwargs = {"prompt": PROMPT}
+        #chain_type_kwargs = {"prompt": PROMPT}
 
         self.qa = RetrievalQA.from_chain_type(
             llm=llm,
             chain_type="map_rerank",
             retriever=docsearch.as_retriever(search_kwargs={"k": 2}),
-            chain_type_kwargs=chain_type_kwargs,
         )
 
     def query(self, q: str) -> str:
         print("\nquery: ", q)
-        res = self.qa.run(q)
+        query = PROMPT.format(question = q)
+        print(query)
+        res = self.qa.run(query)
         print("answer: ", res)
         return res
