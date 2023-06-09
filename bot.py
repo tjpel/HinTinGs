@@ -4,7 +4,7 @@ from langchain.vectorstores import Chroma
 from langchain.text_splitter import CharacterTextSplitter
 from langchain.chat_models import ChatOpenAI
 from langchain.chains import RetrievalQA
-from langchain.document_loaders import TextLoader, UnstructuredFileLoader
+from langchain.document_loaders import DirectoryLoader
 from pathlib import Path
 
 # load environmental variables
@@ -23,8 +23,8 @@ class Bot:
         """
         self.path = path
 
-        # load the file
-        loader = UnstructuredFileLoader(path)
+        # load the file directory, will use the unstructured
+        loader = DirectoryLoader(path)
         documents = loader.load()
 
         text_splitter = CharacterTextSplitter(chunk_size=1500, chunk_overlap=0)
