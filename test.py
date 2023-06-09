@@ -1,6 +1,6 @@
 from bot import Bot
 
-# this file tests the Q&A bot
+# this file tests the Q&A bot.
 
 b = Bot("data")
 #b.query("What is Langchain?")
