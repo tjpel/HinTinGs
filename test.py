@@ -9,8 +9,9 @@ b.query("What is Langchain named after?")
 
 
 b.query("What is happening in New York?")
-b.query("Where did the fire start?")
+b.query("What country did the fire start in?")
 b.query("What is the best ice cream flavor?")
+b.query("Who is the president of the United States?")
 
 
 b.query("What is the class about?")

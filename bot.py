@@ -6,6 +6,7 @@ from langchain.chat_models import ChatOpenAI
 from langchain.chains import RetrievalQA
 from langchain.document_loaders import DirectoryLoader
 from pathlib import Path
+from prompts import PROMPT
 
 # load environmental variables
 load_dotenv()
@@ -35,10 +36,13 @@ class Bot:
         docsearch = Chroma.from_documents(texts, embeddings)
 
         llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0)
+        chain_type_kwargs = {"prompt": PROMPT}
+
         self.qa = RetrievalQA.from_chain_type(
             llm=llm,
             chain_type="map_rerank",
             retriever=docsearch.as_retriever(search_kwargs={"k": 2}),
+            chain_type_kwargs=chain_type_kwargs,
         )
 
     def query(self, q: str) -> str:
