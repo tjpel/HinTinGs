@@ -1,0 +1,25 @@
+@use './palette';
+
+.gray {
+	background-color: palette.$gray;
+
+	&:hover {
+		background-color: palette.$gray-hover;
+	}
+}
+
+.green {
+	background-color: palette.$green;
+
+	&:hover {
+		background-color: palette.$green-hover;
+	}
+}
+
+.orange {
+	background-color: palette.$orange;
+
+	&:hover {
+		background-color: palette.$orange-hover;
+	}
+}

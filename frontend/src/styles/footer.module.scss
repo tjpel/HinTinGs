@@ -1,0 +1,17 @@
+@use './palette';
+
+.footer {
+	// background-color: palette.$white;
+}
+
+p{
+	color: palette.$white;
+}
+
+.gray-muted {
+	color: palette.$gray-muted;
+}
+
+.gray-border {
+	border-color: palette.$border-gray-dark;
+}

@@ -1,0 +1,26 @@
+@keyframes fade-in {
+	0% {
+		display: block;
+		background-color: rgba(0, 0, 0, 0);
+	}
+	100% {
+		display: block;
+		background-color: rgba(0, 0, 0, 0.7);
+	}
+}
+
+.overlay-container {
+	display: none;
+	position: fixed;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	z-index: 100;
+	background-color: rgba(0, 0, 0, 0);
+
+	&.show {
+		display: block;
+		animation: fade-in 130ms ease-in 0s forwards;
+	}
+}

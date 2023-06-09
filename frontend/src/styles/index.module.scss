@@ -1,0 +1,21 @@
+@use './palette';
+
+body {
+	background-color: palette.$dot-gray;
+}
+
+h1 {
+	color: palette.$white;
+}
+
+.border-gray {
+	border: 1px solid palette.$border-gray;
+}
+
+.bg-dot-gray {
+	background-color: palette.$dot-gray;
+}
+
+.bg-green {
+	background-color: palette.$green;
+}
