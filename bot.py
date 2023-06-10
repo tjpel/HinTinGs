@@ -3,7 +3,8 @@ from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.vectorstores import Chroma
 from langchain.text_splitter import CharacterTextSplitter
 from langchain.chat_models import ChatOpenAI
-from langchain.chains import RetrievalQA
+from langchain.chains import ConversationalRetrievalChain
+from langchain.memory import ConversationBufferMemory
 from langchain.document_loaders import DirectoryLoader
 from pathlib import Path
 from prompts import PROMPT
@@ -34,20 +35,24 @@ class Bot:
         # turn text into embedding ➡️ Chroma vector db
         embeddings = OpenAIEmbeddings()
         docsearch = Chroma.from_documents(texts, embeddings)
+        memory = ConversationBufferMemory(
+            memory_key="chat_history", return_messages=True
+        )
 
         llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0)
-        #chain_type_kwargs = {"prompt": PROMPT}
+        # chain_type_kwargs = {"prompt": PROMPT}
 
-        self.qa = RetrievalQA.from_chain_type(
+        self.qa = ConversationalRetrievalChain.from_llm(
             llm=llm,
             chain_type="map_rerank",
             retriever=docsearch.as_retriever(search_kwargs={"k": 2}),
+            memory=memory,
         )
 
     def query(self, q: str) -> str:
         print("\nquery: ", q)
-        query = PROMPT.format(question = q)
-        #print(query)
-        res = self.qa.run(query)
+        # query = PROMPT.format(question = q)
+        # print(query)
+        res = self.qa.run(q)
         print("answer: ", res)
         return res
