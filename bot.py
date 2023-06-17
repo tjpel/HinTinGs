@@ -29,7 +29,7 @@ class Bot:
         loader = DirectoryLoader(path)
         documents = loader.load()
 
-        text_splitter = CharacterTextSplitter(chunk_size=1500, chunk_overlap=0)
+        text_splitter = CharacterTextSplitter(chunk_size=2500, chunk_overlap=0)
         texts = text_splitter.split_documents(documents)
 
         # turn text into embedding ➡️ Chroma vector db
