@@ -1,27 +1,65 @@
 from bot import Bot
+import pandas as pd
+from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
+import time
 
-# this file tests the Q&A bot.
+PATH_TO_TESTING_CSV = 'testing_suite/testing_results.csv'
 
-b = Bot("data")
-b.query("What is Langchain?")
-b.query("Is Langchain a framework or library?")
-b.query("What is it named after?")
+#LIMIT_QUESTIONS limits the amount of questions asked to MAX_QUESTIONS_TO_TEST. If you enable LIMIT_QUESTIONS, your results will not be saved to PATH_TO_TRAINING_CSV.
+LIMIT_QUESTIONS = False
+MAX_QUESTIONS_TO_TEST = 5
 
-
-b.query("What is happening in New York?")
-b.query("What country is on fire?")
-b.query("What is the best ice cream flavor?")
-b.query("Who is the president of the United States?")
+VERBOSE = True
 
 
-b.query("What is the class about?")
-b.query("What is the policy for cheating?")
-b.query("What are the prerequisites for the course?")
-b.query("Can I take this course online?")
+test = pd.read_csv(PATH_TO_TESTING_CSV)
+if LIMIT_QUESTIONS:
+    test = test.head(MAX_QUESTIONS_TO_TEST)
 
-b.query("What is the research paper about?")
-b.query("What is the model used?")
+model = AutoModelForSeq2SeqLM.from_pretrained("google/flan-t5-base")
+tokenizer = AutoTokenizer.from_pretrained("google/flan-t5-base")
 
-b.query("How was the work divided and who did which part for the arudino project?")
-b.query("Who did which part?")
-b.query("Show the code used?")
+last_input = ""
+for index, row in test.iterrows():
+
+    time.sleep(15) #TODO: Stops working after 10 or so prompts without this, seems the problem is Flan
+
+    if VERBOSE:
+        print(f"Current Index: {index}")
+
+    #dump old conversation if talking about new document
+    if last_input != row['Input File']:
+        b = Bot('data')
+
+    #.iloc mess is because updating row doesn't update test
+    test.iloc[index, test.columns.get_loc('HiNTinGs Answer')] = hintings_answer = b.query(row['Question']) 
+
+    prompt = f"""
+        Giving just yes or no as an answer, do these two phrases have the same main point?
+        Phrase #1: {row['Human Answer']}
+        Phrase #2: {hintings_answer}
+        """
+    
+    if VERBOSE:
+        print(prompt)
+
+    inputs = tokenizer(prompt, return_tensors="pt")
+
+    outputs = model.generate(**inputs, max_length=3)
+    res = tokenizer.batch_decode(outputs, skip_special_tokens=True)
+
+    if VERBOSE:
+        print(res)
+
+    if "yes" in res[0]:
+        test.iloc[index, test.columns.get_loc('Pass')] = 1
+    else:
+        test.iloc[index, test.columns.get_loc('Pass')] = 0
+   
+    last_input = row['Input File']
+
+print(test['Pass'].value_counts())
+print(len(test[test['Pass'] == 1]) / len(test))
+
+if not LIMIT_QUESTIONS:   
+    test.to_csv(PATH_TO_TESTING_CSV)
