@@ -1,7 +1,7 @@
 from dotenv import load_dotenv
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.vectorstores import Chroma
-from langchain.text_splitter import CharacterTextSplitter
+from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.chat_models import ChatOpenAI
 from langchain.chains import ConversationalRetrievalChain
 from langchain.memory import ConversationBufferMemory
@@ -29,7 +29,7 @@ class Bot:
         loader = DirectoryLoader(path)
         documents = loader.load()
 
-        text_splitter = CharacterTextSplitter(chunk_size=2500, chunk_overlap=0)
+        text_splitter = RecursiveCharacterTextSplitter(chunk_size=2500, chunk_overlap=0)
         texts = text_splitter.split_documents(documents)
 
         # turn text into embedding ➡️ Chroma vector db
@@ -40,11 +40,12 @@ class Bot:
         )
 
         llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0)
+
         # chain_type_kwargs = {"prompt": PROMPT}
 
         self.qa = ConversationalRetrievalChain.from_llm(
             llm=llm,
-            chain_type="map_rerank",
+            # condense_question_llm=condense_question_llm,
             retriever=docsearch.as_retriever(search_kwargs={"k": 2}),
             memory=memory,
         )
