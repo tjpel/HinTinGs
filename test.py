@@ -2,6 +2,10 @@ from bot import Bot
 import pandas as pd
 from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
 import time
+import sys
+
+
+
 
 PATH_TO_TESTING_CSV = "testing_suite/testing_results.csv"
 
@@ -12,6 +16,13 @@ MAX_QUESTIONS_TO_TEST = 5
 VERBOSE = True
 
 
+b = Bot("data")
+if len(sys.argv) > 1:
+    for arg in sys.argv[1:]:
+        b.query(arg)
+
+    sys.exit()
+
 test = pd.read_csv(PATH_TO_TESTING_CSV)
 if LIMIT_QUESTIONS:
     test = test.head(MAX_QUESTIONS_TO_TEST)
@@ -20,7 +31,7 @@ model = AutoModelForSeq2SeqLM.from_pretrained("google/flan-t5-base")
 tokenizer = AutoTokenizer.from_pretrained("google/flan-t5-base")
 
 last_input = ""
-b = Bot("data")
+
 
 for index, row in test.iterrows():
     time.sleep(
