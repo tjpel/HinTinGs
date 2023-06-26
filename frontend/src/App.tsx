@@ -1,7 +1,6 @@
 import Footer from "./components/footer";
 import Navbar from "./components/navbar";
 import IndexPage from "./pages";
-import AboutPage from "./pages";
 
 // routing here in the future
 function App() {
