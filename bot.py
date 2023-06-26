@@ -34,8 +34,8 @@ class Bot:
         loader = DirectoryLoader(path)
         documents = loader.load()
 
-        # split by 3000 characters, which is about 500 words
-        text_splitter = CharacterTextSplitter(chunk_size=3000, chunk_overlap=0)
+        # split by 1500 characters, which is about 250 words
+        text_splitter = CharacterTextSplitter(chunk_size=1500, chunk_overlap=0)
         texts = text_splitter.split_documents(documents)
 
         # turn text into embedding ➡️ Chroma vector db

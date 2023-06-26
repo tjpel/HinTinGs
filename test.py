@@ -40,7 +40,9 @@ for index, row in test.iterrows():
     ] = hintings_answer = b.query(row["Question"])
 
     prompt = f"""
-        Giving just yes or no as an answer, do these two phrases have the same main point?
+        Giving just yes or no as an answer, do these two phrases have the same main point? Hint: this document does not 
+        answer this question is the same saying that no context is given
+
         Phrase #1: {row['Human Answer']}
         Phrase #2: {hintings_answer}
         """
