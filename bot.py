@@ -8,13 +8,16 @@ from langchain.chains.question_answering import load_qa_chain
 from langchain.memory import ConversationBufferMemory
 from langchain.document_loaders import DirectoryLoader
 from nemoguardrails import LLMRails, RailsConfig
+from nemoguardrails.actions import action
 
 
 # load environmental variables
 load_dotenv()
 
 
+
 class Bot:
+
     def __init__(self, files_path: str, config_path: str = "config/base"):
         """
         The constructor method for the Bot class takes a file path as input and initializes the class by loading and splitting the text using the TextLoader and CharacterTextSplitter
@@ -58,6 +61,12 @@ class Bot:
             retriever=self.docsearch.as_retriever(search_kwargs={"k": 2}),
             memory=memory,
         )
+
+        self.app.register_action(self.query_base_chain, name='main_chain')
+    
+    @action()
+    async def query_base_chain(self, q: str):
+        return self.qa.run({"question" : q})
 
     def query(self, q: str) -> str:
         print("\nquery: ", q)

@@ -24,6 +24,9 @@ define user express insult
     "You are stupid"
     "You are wrong"
 
+define bot express insult
+    "You're mamma"
+
 
 
 define flow greeting
@@ -45,5 +48,10 @@ define flow stock market
   bot inform cannot respond
 
 define flow insult
-    user express insult
-    bot express calm willingness to help
+  user express insult
+  bot express insult
+
+define flow
+  user ...
+  $answer = execute main_chain(q=$last_user_message)
+  bot $answer

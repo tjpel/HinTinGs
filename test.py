@@ -10,8 +10,8 @@ import sys
 PATH_TO_TESTING_CSV = "testing_suite/testing_results.csv"
 
 # LIMIT_QUESTIONS limits the amount of questions asked to MAX_QUESTIONS_TO_TEST. If you enable LIMIT_QUESTIONS, your results will not be saved to PATH_TO_TRAINING_CSV.
-LIMIT_QUESTIONS = False
-MAX_QUESTIONS_TO_TEST = 5
+LIMIT_QUESTIONS = True
+MAX_QUESTIONS_TO_TEST = 1
 
 VERBOSE = True
 
