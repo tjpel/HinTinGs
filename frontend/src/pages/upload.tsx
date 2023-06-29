@@ -19,8 +19,8 @@ function UploadOverlay({ show, onUploadSuccess }: Props) {
 	const [processingUpload, setProcessingUpload] = useState(false);
 
 	const FileInput = useRef<HTMLInputElement>(null);
-	console.log("VITE_API_URL is " + import.meta.env.VITE_API_URL);
-	console.log("API URL is " + API_URL);
+	//console.log("VITE_API_URL is " + import.meta.env.VITE_API_URL);
+	//console.log("API URL is " + API_URL);
 
 	const filesJSX = [];
 	if (files.length) {
