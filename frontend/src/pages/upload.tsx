@@ -51,7 +51,6 @@ function UploadOverlay({ show, onUploadSuccess }: Props) {
 			method: 'POST',
 			body: form
 		};
-		alert('Uploading files to server');
 		console.log('Uploading files to server');
 		console.log(files);		
 		protectedFetch(url, options).then(() => {

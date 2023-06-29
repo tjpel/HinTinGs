@@ -43,9 +43,15 @@ def query():
     
     if request.method == 'POST':
         print("I'm RECEIVING A POST REQUEST")
-        print('request.form: ' + str(request.form))
-        return Response('POST received', status=204)
-    return Response('idk something bad', status=401)
+        req = request.get_json()
+        question = req['question']
+        print("Question was: " + question)
+        return make_response({
+                'question': question,
+                'answer': 'your question was boring so this is your answer',
+                'sources': 'i made it all up'
+                }, 204)
+    return Response(jsonify('something broke'), status=401)
 
 
 @app.route(f'{base_url}/documents/', methods=['POST'])
@@ -61,7 +67,6 @@ def documents():
 
     data = []
     sources = []
-    print("File is just the entire text file so I won't print it all.")
         # ext = os.path.splitext(file[0])[1]
         # if ext.lower() in ['.md', '.txt']:
         #     data.append(str(file.read(), encoding='utf-8', errors='ignore'))
@@ -84,7 +89,6 @@ def documents():
     #         content=docs[i],
     #         embedding=embeddings[i]
     #     )
-    print(Response(response='files received! ready to be queried', status=200).get_json())
     return make_response(jsonify('files received! ready to be queried'), 200)
 
 
