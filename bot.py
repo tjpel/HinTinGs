@@ -4,8 +4,9 @@ from langchain.vectorstores import Chroma
 from langchain.text_splitter import CharacterTextSplitter
 from langchain.chat_models import ChatOpenAI
 from langchain.chains import ConversationalRetrievalChain
-from langchain.chains import LLMChain
+from langchain.chains.qa_with_sources import load_qa_with_sources_chain
 from langchain.chains.conversational_retrieval.prompts import CONDENSE_QUESTION_PROMPT
+from langchain.chains import LLMChain
 from langchain.chains.question_answering import load_qa_chain
 from langchain.memory import ConversationBufferMemory
 from langchain.document_loaders import DirectoryLoader
@@ -55,7 +56,7 @@ class Bot:
 
         # use prompt engineering, and the map reduce chain
         question_generator = LLMChain(llm=self.app.llm, prompt=CONDENSE_QUESTION_PROMPT)
-        doc_chain = load_qa_chain(self.app.llm, chain_type="map_reduce")
+        doc_chain = load_qa_with_sources_chain(self.app.llm, chain_type="map_rerank")
 
         # creates the QA chain, should reference to the source
         self.qa = ConversationalRetrievalChain(
@@ -79,4 +80,4 @@ class Bot:
         return res
 
     def clear_memory(self):
-        self.history = []
+        self.chat_history = []
