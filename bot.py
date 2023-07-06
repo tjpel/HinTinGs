@@ -4,6 +4,8 @@ from langchain.vectorstores import Chroma
 from langchain.text_splitter import CharacterTextSplitter
 from langchain.chat_models import ChatOpenAI
 from langchain.chains import ConversationalRetrievalChain
+from langchain.chains import LLMChain
+from langchain.chains.conversational_retrieval.prompts import CONDENSE_QUESTION_PROMPT
 from langchain.chains.question_answering import load_qa_chain
 from langchain.memory import ConversationBufferMemory
 from langchain.document_loaders import DirectoryLoader
@@ -15,9 +17,7 @@ from nemoguardrails.actions import action
 load_dotenv()
 
 
-
 class Bot:
-
     def __init__(self, files_path: str, config_path: str = "config/base"):
         """
         The constructor method for the Bot class takes a file path as input and initializes the class by loading and splitting the text using the TextLoader and CharacterTextSplitter
@@ -31,16 +31,14 @@ class Bot:
         self.files_path = files_path
         self.config_path = config_path
 
-        #set up NeMo rails
+        # set up NeMo rails
         config = RailsConfig.from_path(config_path)
 
-        #initilize
+        # initialize
         self.app = LLMRails(config)
 
         # create a memory object, which tracks the conversation history
-        memory = ConversationBufferMemory(
-            memory_key="chat_history", return_messages=True
-        )
+        self.chat_history = []
 
         # load the file directory, will use the unstructured
         loader = DirectoryLoader(files_path)
@@ -55,18 +53,22 @@ class Bot:
         self.docsearch = Chroma.from_documents(texts, embeddings)
         # chain_type_kwargs = {"prompt": PROMPT}
 
+        # use prompt engineering, and the map reduce chain
+        question_generator = LLMChain(llm=self.app.llm, prompt=CONDENSE_QUESTION_PROMPT)
+        doc_chain = load_qa_chain(self.app.llm, chain_type="map_reduce")
+
         # creates the QA chain, should reference to the source
-        self.qa = ConversationalRetrievalChain.from_llm(
-            llm=self.app.llm,
+        self.qa = ConversationalRetrievalChain(
             retriever=self.docsearch.as_retriever(search_kwargs={"k": 2}),
-            memory=memory,
+            question_generator=question_generator,
+            combine_docs_chain=doc_chain,
         )
 
-        self.app.register_action(self.query_base_chain, name='main_chain')
-    
+        self.app.register_action(self.query_base_chain, name="main_chain")
+
     @action()
     async def query_base_chain(self, q: str):
-        return self.qa.run({"question" : q})
+        return self.qa({"question": q, "chat_history": self.chat_history})["answer"]
 
     def query(self, q: str) -> str:
         print("\nquery: ", q)
@@ -77,11 +79,4 @@ class Bot:
         return res
 
     def clear_memory(self):
-        # creates the a new chain, but still has access to the pre-computed embeddings
-        self.qa = ConversationalRetrievalChain.from_llm(
-            llm=self.app.llm,
-            retriever=self.docsearch.as_retriever(search_kwargs={"k": 2}),
-            memory=ConversationBufferMemory(
-                memory_key="chat_history", return_messages=True
-            ),
-        )
+        self.history = []
