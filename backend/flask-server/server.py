@@ -43,7 +43,7 @@ def query():
     
     if request.method == 'POST':
         req = request.get_json()
-        question = req['question']
+        question = req['question'] # This is the question that the user asked in the form
         answer = "your question was boring so this is your answer"
         source_list = ["source1", "source2", "source3"]
         # answer = query(question)
@@ -59,7 +59,7 @@ def query():
 
 @app.route(f'{base_url}/documents/', methods=['POST'])
 def documents():
-    files = request.files['files']
+    files = request.files['files'] 
     if not files or len(request.files) < 1:
         return Response('No files received', status=400)
 
