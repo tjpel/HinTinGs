@@ -46,12 +46,12 @@ function IndexPage() {
 
 	const handleSubmit = (e) => {
 		e.preventDefault();
-		alert('submitting question')
+		//alert('submitting question')
 		onQuestionAsked();
 	}
 
 	const onQuestionAsked = () => {
-		console.log("Asking question " + question)
+		//console.log("Asking question " + question)
 		setProcessingAnswer(true);
 		const url = API_URL + '/query/';
 		const options = {
@@ -64,7 +64,7 @@ function IndexPage() {
 			}
 		};
 		protectedFetch<Answer>(url, options).then(res => {
-			console.log("Receiving answer" + res);
+			//console.log("Receiving answer" + res);
 			setAnswer(res);
 			setProcessingAnswer(false);
 			setQuestion('');
@@ -129,7 +129,7 @@ function IndexPage() {
 				hintings
 			</h1>
 			<div className='xl:absolute xl:top-20 xl:right-20 mb-5'>
-				<h4 className='hidden xl:block text-lg font-bold text-center mb-3'>
+				<h4 className='hidden xl:block text-lg font-bold text-center mb-3 text-white'>
 					Documents
 				</h4>
 				<div className='flex flex-col items-center sm:items-start sm:flex-row sm:flex-wrap sm:justify-between xl:block max-h-96 overflow-y-auto'>
@@ -157,7 +157,7 @@ function IndexPage() {
 					bg='green'
 					className='absolute top-2 right-2 w-8 h-8 text-white rounded-full pt-[0.1rem]'
 					onClick={() => {
-						console.log("i pressed the button");
+						//console.log("i pressed the button");
 						handleSubmit;
 					}}>
 					<FontAwesomeIcon icon={faArrowRight} />
@@ -167,12 +167,12 @@ function IndexPage() {
 				answer ?
 					<div>
 						<div className='mb-14'>
-							<h4 className='mb-2 text-2xl font-bold'>{answer.question}</h4>
+							<h4 className='mb-2 text-2xl font-bold text-white'>{answer.question}</h4>
 							<p>{answer.answer}</p>
 						</div>
 						<hr className='mb-5' />
 						<div>
-							<h4 className='mb-2 text-2xl font-bold'>
+							<h4 className='mb-2 text-2xl font-bold text-white'>
 								Sources
 							</h4>
 							<ul>
