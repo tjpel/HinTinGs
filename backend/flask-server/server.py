@@ -42,14 +42,16 @@ def query():
     print("I'm getting queried or something")
     
     if request.method == 'POST':
-        print("I'm RECEIVING A POST REQUEST")
         req = request.get_json()
         question = req['question']
-        print("Question was: " + question)
+        answer = "your question was boring so this is your answer"
+        source_list = ["source1", "source2", "source3"]
+        # answer = query(question)
+        # source_list = get_sources(question)
         return make_response(
             jsonify(question=question,
-                answer='your question was boring so this is your answer',
-                sources=['i made it all up'],
+                answer=answer,
+                sources=source_list,
                 status=200)
                              )
     return Response(jsonify('something broke'), status=401)
@@ -57,12 +59,7 @@ def query():
 
 @app.route(f'{base_url}/documents/', methods=['POST'])
 def documents():
-    print("I'm RECEIVING A POST REQUEST")
-    print("Request Method: " + str(request.method))
-    print("Request Files: " + str(request.files))
-    
     files = request.files['files']
-    print("Files: " + str(files))
     if not files or len(request.files) < 1:
         return Response('No files received', status=400)
 
