@@ -44,6 +44,12 @@ function IndexPage() {
 		});
 	}, []);
 
+	const handleSubmit = (e) => {
+		e.preventDefault();
+		alert('submitting question')
+		onQuestionAsked();
+	}
+
 	const onQuestionAsked = () => {
 		console.log("Asking question " + question)
 		setProcessingAnswer(true);
@@ -139,7 +145,7 @@ function IndexPage() {
 					</Button>
 				</div>
 			</div>
-			<form onSubmit={e => {e.preventDefault()}} className='relative mb-10'>
+			<form onSubmit={handleSubmit} className='relative mb-10'>
 				<input
 					className={'px-5 py-3 w-full rounded-full shadow-md ' + s['border-gray']}
 					placeholder='ask anything...'
@@ -152,7 +158,7 @@ function IndexPage() {
 					className='absolute top-2 right-2 w-8 h-8 text-white rounded-full pt-[0.1rem]'
 					onClick={() => {
 						console.log("i pressed the button");
-						onQuestionAsked();
+						handleSubmit;
 					}}>
 					<FontAwesomeIcon icon={faArrowRight} />
 				</Button>
