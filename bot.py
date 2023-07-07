@@ -2,13 +2,8 @@ from dotenv import load_dotenv
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.vectorstores import Chroma
 from langchain.text_splitter import CharacterTextSplitter
-from langchain.chat_models import ChatOpenAI
 from langchain.chains import ConversationalRetrievalChain
-from langchain.chains.qa_with_sources import load_qa_with_sources_chain
-from langchain.chains.conversational_retrieval.prompts import CONDENSE_QUESTION_PROMPT
-from langchain.chains import LLMChain
-from langchain.chains.question_answering import load_qa_chain
-from langchain.memory import ConversationBufferMemory
+from langchain.memory import ConversationBufferMemory, ConversationBufferWindowMemory
 from langchain.document_loaders import DirectoryLoader
 from nemoguardrails import LLMRails, RailsConfig
 from nemoguardrails.actions import action
@@ -39,7 +34,8 @@ class Bot:
         self.app = LLMRails(config)
 
         # create a memory object, which tracks the conversation history
-        self.chat_history = []
+        self.memory = ConversationBufferMemory(memory_key="chat_history",return_messages=True)
+
 
         # load the file directory, will use the unstructured
         loader = DirectoryLoader(files_path)
@@ -52,24 +48,21 @@ class Bot:
         # turn text into embedding ➡️ Chroma vector db
         embeddings = OpenAIEmbeddings()
         self.docsearch = Chroma.from_documents(texts, embeddings)
-        # chain_type_kwargs = {"prompt": PROMPT}
-
-        # use prompt engineering, and the map reduce chain
-        question_generator = LLMChain(llm=self.app.llm, prompt=CONDENSE_QUESTION_PROMPT)
-        doc_chain = load_qa_with_sources_chain(self.app.llm, chain_type="map_rerank")
 
         # creates the QA chain, should reference to the source
-        self.qa = ConversationalRetrievalChain(
+        self.qa = ConversationalRetrievalChain.from_llm(
+            llm=self.app.llm,
             retriever=self.docsearch.as_retriever(search_kwargs={"k": 2}),
-            question_generator=question_generator,
-            combine_docs_chain=doc_chain,
+            chain_type="map_rerank",
+            verbose=True,
+            memory=self.memory,
         )
 
         self.app.register_action(self.query_base_chain, name="main_chain")
 
     @action()
     async def query_base_chain(self, q: str):
-        return self.qa({"question": q, "chat_history": self.chat_history})["answer"]
+        return self.qa({"question": q})["answer"] 
 
     def query(self, q: str) -> str:
         print("\nquery: ", q)
@@ -80,4 +73,12 @@ class Bot:
         return res
 
     def clear_memory(self):
-        self.chat_history = []
+        # creates the a new chain, but still has access to the pre-computed embeddings
+        self.memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
+        self.qa = ConversationalRetrievalChain.from_llm(
+            llm=self.app.llm,
+            retriever=self.docsearch.as_retriever(search_kwargs={"k": 2}),
+            chain_type="map_rerank",
+            verbose=True,
+            memory=self.memory,
+        )
