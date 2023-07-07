@@ -1,6 +1,5 @@
 from flask import Flask, app, request, render_template, Response, make_response, jsonify
 from werkzeug.utils import secure_filename
-#from flask_restful import Api, Resource
 from flask_cors import CORS
 import os
 import json
@@ -30,12 +29,6 @@ CORS(app, resources={r'/*': {'origins': '*'}})
 
 port = 5000
 base_url = get_base_url(port)
-
-# @app.route('/query', methods=['GET', 'POST'])
-# def query():
-#     if request.method == 'POST':
-#         return 'POST received', 204
-#     return 'GET received', 200
 
 @app.route(f'{base_url}/query/', methods=['POST'])
 def query():
