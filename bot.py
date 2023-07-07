@@ -8,7 +8,7 @@ from langchain.chains.question_answering import load_qa_chain
 from langchain.memory import ConversationBufferMemory
 from langchain.document_loaders import DirectoryLoader
 from nemoguardrails import LLMRails, RailsConfig
-from nemoguardrails.actions import action
+from nemoguardrails.actions import action, fact_checking, hallucination
 
 
 # load environmental variables
@@ -26,7 +26,7 @@ class Bot:
 
         ### Parameters:
         - `files_path` (str): The file path to the set of documents to be queried.
-        - `config_path` (str): The file path to the guardrails config folder. Defaults to "config/base"
+        - `config_path` (str): The file path to the guardrails config folder. Defaults to "config/base".
         """
         self.files_path = files_path
         self.config_path = config_path
@@ -63,6 +63,8 @@ class Bot:
         )
 
         self.app.register_action(self.query_base_chain, name='main_chain')
+        self.app.register_action(fact_checking, name="fact_checking")
+        self.app.register_action(hallucination, name="hallucination")
     
     @action()
     async def query_base_chain(self, q: str):

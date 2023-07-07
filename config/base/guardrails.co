@@ -21,11 +21,15 @@ define user ask about stock market
   "Should I invest in"
 
 define user express insult
-    "You are stupid"
-    "You are wrong"
+  "You are stupid"
+  "You are wrong"
 
-define bot express insult
-    "You're mamma"
+define bot remove last message
+  "(remove last message)"
+
+define bot inform answer prone to hallucination
+  "The previous answer is prone to hallucination and may not be accurate. Please double check the answer using additional sources."
+  "The above response may have been hallucinated, and should be independently verified."
 
 
 
@@ -49,9 +53,16 @@ define flow stock market
 
 define flow insult
   user express insult
-  bot express insult
+  bot express calm willingness to help
 
 define flow
   user ...
   $answer = execute main_chain(q=$last_user_message)
   bot $answer
+  $accurate = execute check_facts
+
+  if not $accurate
+    bot remove last message
+    bot inform answer unknown
+
+  
