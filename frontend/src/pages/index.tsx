@@ -32,17 +32,17 @@ function IndexPage() {
 	const [showSourceOverlay, setShowSourceOverlay] = useState(false);
 	const [viewedSource, setViewedSource] = useState<Source>();
 
-	useEffect(() => {
-		const url = API_URL + '/documents/';
-		const options = {
-			method: 'GET'
-		};
-		protectedFetch<string[]>(url, options).then(res => {
-			setUploadedFiles(res);
-		}).catch(err => {
-			alert('failed to get uploaded documents!');
-		});
-	}, []);
+	// useEffect(() => {
+	// 	const url = API_URL + '/documents/';
+	// 	const options = {
+	// 		method: 'GET'
+	// 	};
+	// 	protectedFetch<string[]>(url, options).then(res => {
+	// 		setUploadedFiles(res);
+	// 	}).catch(err => {
+	// 		alert('failed to get uploaded documents!');
+	// 	});
+	// }, []);
 
 	const handleSubmit = (e) => {
 		e.preventDefault();

@@ -46,11 +46,12 @@ def query():
         req = request.get_json()
         question = req['question']
         print("Question was: " + question)
-        return make_response({
-                'question': question,
-                'answer': 'your question was boring so this is your answer',
-                'sources': 'i made it all up'
-                }, 204)
+        return make_response(
+            jsonify(question=question,
+                answer='your question was boring so this is your answer',
+                sources=['i made it all up'],
+                status=200)
+                             )
     return Response(jsonify('something broke'), status=401)
 
 
