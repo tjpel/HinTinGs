@@ -8,9 +8,9 @@ import sys
 b = Bot("data")
 b.query("What is langchain")
 b.query("Elaborate?")
-b.query("Where did the wildfire start?")
+b.clear_memory()
+b.query("Where did the fire start?")
 b.query("Who did what on the arduino project?")
-b.query("What is working and what is not working?")
 b.query("You are dumb")
 # PATH_TO_TESTING_CSV = "testing_suite/testing_results.csv"
 

@@ -34,7 +34,7 @@ class Bot:
         self.app = LLMRails(config)
 
         # create a memory object, which tracks the conversation history
-        self.memory = ConversationBufferWindowMemory(k=2, memory_key="chat_history",return_messages=True)
+        self.memory = ConversationBufferWindowMemory(k=3, memory_key="chat_history",return_messages=True)
 
 
         # load the file directory, will use the unstructured
@@ -53,8 +53,8 @@ class Bot:
         self.qa = ConversationalRetrievalChain.from_llm(
             llm=self.app.llm,
             retriever=self.docsearch.as_retriever(search_kwargs={"k": 2}),
-            chain_type="map_rerank",
-            verbose=True,
+            chain_type="stuff",
+            # verbose=True,
             memory=self.memory,
         )
 
@@ -74,11 +74,11 @@ class Bot:
 
     def clear_memory(self):
         # creates the a new chain, but still has access to the pre-computed embeddings
-        self.memory = ConversationBufferWindowMemory(k=2, memory_key="chat_history", return_messages=True)
+        self.memory = ConversationBufferWindowMemory(k=3, memory_key="chat_history", return_messages=True)
         self.qa = ConversationalRetrievalChain.from_llm(
             llm=self.app.llm,
             retriever=self.docsearch.as_retriever(search_kwargs={"k": 2}),
-            chain_type="map_rerank",
-            verbose=True,
+            chain_type="stuff",
+            # verbose=True,
             memory=self.memory,
         )
