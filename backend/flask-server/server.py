@@ -1,7 +1,7 @@
 from flask import Flask, app, request, render_template, Response, make_response, jsonify
 from werkzeug.utils import secure_filename
 from flask_cors import CORS
-import os
+import os, shutil
 import json
 
 def get_base_url(port:int) -> str:
@@ -29,6 +29,23 @@ CORS(app, resources={r'/*': {'origins': '*'}})
 
 port = 5000
 base_url = get_base_url(port)
+
+def clear_files():
+    '''
+    Clears all files in the 'files' folder.
+    '''
+    UPLOAD_FOLDER = 'files'
+    #clears uploads folder on flask app run
+    for filename in os.listdir(UPLOAD_FOLDER):
+        file_path = os.path.join(UPLOAD_FOLDER, filename)
+        try:
+            if os.path.isfile(file_path) or os.path.islink(file_path):
+                os.unlink(file_path)
+            elif os.path.isdir(file_path):
+                shutil.rmtree(file_path)
+        except Exception as e:
+            print('Failed to delete %s. Reason: %s' % (file_path, e))
+
 
 @app.route(f'{base_url}/query/', methods=['POST'])
 def query():
@@ -86,4 +103,5 @@ def documents():
 
 
 if __name__ == '__main__':
+    
     app.run(debug=True)
