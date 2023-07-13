@@ -3,6 +3,7 @@ from werkzeug.utils import secure_filename
 from flask_cors import CORS
 import os, shutil
 import json
+import bot as bot
 
 def get_base_url(port:int) -> str:
     '''
@@ -54,10 +55,10 @@ def query():
     if request.method == 'POST':
         req = request.get_json()
         question = req['question'] # This is the question that the user asked in the form
-        answer = "your question was boring so this is your answer"
-        source_list = ["source1", "source2", "source3"]
         # answer = query(question)
+        answer = "your question was boring so this is your answer"
         # source_list = get_sources(question)
+        source_list = ["source1", "source2", "source3"]
         return make_response(
             jsonify(question=question,
                 answer=answer,
@@ -103,5 +104,5 @@ def documents():
 
 
 if __name__ == '__main__':
-    
+    hintings = bot.Bot('files')
     app.run(debug=True)

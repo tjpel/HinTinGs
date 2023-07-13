@@ -25,11 +25,10 @@ class Bot:
         self.path = path
 
         # load the file directory, will use the unstructured
-        loader = DirectoryLoader(path)
-        documents = loader.load()
+        self.load_docs()
 
         text_splitter = CharacterTextSplitter(chunk_size=1500, chunk_overlap=0)
-        texts = text_splitter.split_documents(documents)
+        texts = text_splitter.split_documents(self.documents)
 
         # turn text into embedding ➡️ Chroma vector db
         embeddings = OpenAIEmbeddings()
@@ -51,3 +50,7 @@ class Bot:
         res = self.qa.run(query)
         print("answer: ", res)
         return res
+    
+    def load_docs(self):
+        self.loader = DirectoryLoader(self.path)
+        self.documents = self.loader.load()
