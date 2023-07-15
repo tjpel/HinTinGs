@@ -7,6 +7,9 @@ from langchain.document_loaders import DirectoryLoader
 from langchain.text_splitter import CharacterTextSplitter
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.vectorstores import Chroma
+from gradio_tools.tools import StableDiffusionTool
+
+
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -32,6 +35,7 @@ docsearch = Chroma.from_documents(texts, embeddings)
 qa_chain = RetrievalQA.from_chain_type(llm=llm, chain_type="stuff", 
                                        retriever=docsearch.as_retriever(search_kwargs={"k": 2}),
                                        return_source_documents=True)
+
 tools = [
     Tool(
         name = "Search",
@@ -47,11 +51,19 @@ tools = [
         name="QA-System",
         func=qa_chain,
         description="useful for when asking questions about documents that you have uploaded"
+    ),
+    Tool(
+        name="Diffusion",
+        func=StableDiffusionTool().langchain.run,
+        description="useful for when the user asks to create an image based on a prompt"
     )
 ]
 
 agent = initialize_agent(tools, llm, agent=AgentType.OPENAI_FUNCTIONS, verbose=True)
-agent.run("Based on the document, What is happening in New York?")
-agent.run("What is the weather today in Amherst Massachusetts?")
-agent.run("Based on the document, what is the langchain?")
-agent.run("What is 10 raised to 1.8 power?")
+
+
+agent.run("Create an image of a dog wearing a hat")
+# agent.run("Based on the document, What is happening in New York?")
+# agent.run("What is the weather today in Amherst Massachusetts?")
+# agent.run("Based on the document, what is the langchain?")
+# agent.run("What is 10 raised to 1.8 power?")
