@@ -1,5 +1,6 @@
 from flask import Flask, app, request, render_template, Response, make_response, jsonify
 from werkzeug.utils import secure_filename
+from werkzeug.datastructures import FileStorage
 from flask_cors import CORS
 import os, shutil
 import json
@@ -55,10 +56,10 @@ def query():
     if request.method == 'POST':
         req = request.get_json()
         question = req['question'] # This is the question that the user asked in the form
-        # answer = query(question)
-        answer = "your question was boring so this is your answer"
+        # answer = hintings.query(question)
+        answer = "your question was not important so here\'s a random answer"
         # source_list = get_sources(question)
-        source_list = ["source1", "source2", "source3"]
+        source_list = ["source1"]
         return make_response(
             jsonify(question=question,
                 answer=answer,
@@ -70,16 +71,28 @@ def query():
 
 @app.route(f'{base_url}/documents/', methods=['POST'])
 def documents():
-    files = request.files['files'] 
+    files = request.files.getlist('files')
     if not files or len(request.files) < 1:
         return Response('No files received', status=400)
 
-    data = []
-    sources = []
-        # ext = os.path.splitext(file[0])[1]
-        # if ext.lower() in ['.md', '.txt']:
-        #     data.append(str(file.read(), encoding='utf-8', errors='ignore'))
-        #     sources.append(file.name)
+    #print("Request Files: ", request.files)
+    # print("Files Key: ", files)
+    # print("Reading Files: ", files.read())
+    print("Before saving files")
+    print("Files in folder: \n", os.listdir('files'))
+    for file in files:
+        print("File: ", file)
+        file.save(os.path.join('files', secure_filename(file.filename)))
+    print("Files saved to files folder")
+    
+    print("Files in folder: ", os.listdir('files'))
+    
+    # data = []
+    # sources = []
+    # ext = os.path.splitext(file[0])[1]
+    # if ext.lower() in ['.md', '.txt']:
+    #     data.append(str(file.read(), encoding='utf-8', errors='ignore'))
+    #     sources.append(file.name)
     # text_splitter = CharacterTextSplitter(chunk_size=1500, separator='\n')
     # docs = []
     # metadatas = []
@@ -98,11 +111,16 @@ def documents():
     #         content=docs[i],
     #         embedding=embeddings[i]
     #     )
+    
+    hintings.load_docs()
+    hintings.process_docs()
     return make_response(jsonify('files received! ready to be queried'), 200)
 
 
 
 
 if __name__ == '__main__':
+    clear_files()
+    
     hintings = bot.Bot('files')
     app.run(debug=True)

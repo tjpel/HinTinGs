@@ -6,7 +6,7 @@ from langchain.chat_models import ChatOpenAI
 from langchain.chains import RetrievalQA
 from langchain.document_loaders import DirectoryLoader
 from pathlib import Path
-from prompts import PROMPT
+from bot.prompts import PROMPT
 
 # load environmental variables
 load_dotenv()
@@ -25,32 +25,37 @@ class Bot:
         self.path = path
 
         # load the file directory, will use the unstructured
-        self.load_docs()
-
-        text_splitter = CharacterTextSplitter(chunk_size=1500, chunk_overlap=0)
-        texts = text_splitter.split_documents(self.documents)
+        #self.load_docs()
 
         # turn text into embedding ➡️ Chroma vector db
-        embeddings = OpenAIEmbeddings()
-        docsearch = Chroma.from_documents(texts, embeddings)
+        #self.process_docs()
 
-        llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0)
+        self.llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0)
         #chain_type_kwargs = {"prompt": PROMPT}
 
-        self.qa = RetrievalQA.from_chain_type(
-            llm=llm,
-            chain_type="map_rerank",
-            retriever=docsearch.as_retriever(search_kwargs={"k": 2}),
-        )
+        self.qa = None
 
     def query(self, q: str) -> str:
-        print("\nquery: ", q)
+        #print("\nquery: ", q)
         query = PROMPT.format(question = q)
         #print(query)
         res = self.qa.run(query)
-        print("answer: ", res)
+        #print("answer: ", res)
         return res
     
     def load_docs(self):
         self.loader = DirectoryLoader(self.path)
         self.documents = self.loader.load()
+        
+    def process_docs(self):
+        text_splitter = CharacterTextSplitter(chunk_size=1500, chunk_overlap=0)
+        texts = text_splitter.split_documents(self.documents)
+        
+        embeddings = OpenAIEmbeddings()
+        docsearch = Chroma.from_documents(texts, embeddings)
+        
+        self.qa = RetrievalQA.from_chain_type(
+            llm=self.llm,
+            chain_type="map_rerank",
+            retriever=docsearch.as_retriever(search_kwargs={"k": 2}),
+        )
