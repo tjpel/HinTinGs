@@ -75,14 +75,14 @@ function IndexPage() {
 	};
 
 	const uploadedFilesJSX = uploadedFiles.map((file, i) => {
-		let ext: 'txt' | 'md' = 'txt';
+		let ext = file.name.split('.')[1];
 		// if (file.type === 'plain/markdown') {
 		// 	ext = 'md';
 		// }
 		return (
 			<Document 
 				key={i}
-				className='shadow-md mb-3' 
+				className='shadow-md mb-3 text-white bg-green-500 hover:bg-green-600' 
 				name={file.name}
 				ext={ext}
 			/>

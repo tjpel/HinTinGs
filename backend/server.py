@@ -51,16 +51,16 @@ def clear_files():
 
 @app.route(f'{base_url}/query/', methods=['POST'])
 def query():
-    print("I'm getting queried or something")
-    
     if request.method == 'POST':
         req = request.get_json()
         question = req['question'] # This is the question that the user asked in the form
-        answer = hintings.query(question)
         
+        answer = hintings.query(question)
         # answer = "your question was not important so here\'s a random answer"
+        
         # source_list = get_sources(question)
         source_list = ["source1"]
+        
         return make_response(
             jsonify(question=question,
                 answer=answer,
