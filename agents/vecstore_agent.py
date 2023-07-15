@@ -18,7 +18,7 @@ documents = loader.load()
 llm = ChatOpenAI(temperature=0, model="gpt-3.5-turbo")
 
 # split by 1500 characters, which is about 250 words
-text_splitter = CharacterTextSplitter(chunk_size=1500, chunk_overlap=0)
+text_splitter = CharacterTextSplitter(chunk_size=1500, chunk_overlap=200)
 texts = text_splitter.split_documents(documents)
 
 # turn text into embedding ➡️ Chroma vector db
@@ -37,8 +37,8 @@ agent_executor = create_vectorstore_agent(llm=llm, toolkit=toolkit, verbose=True
 # run vector search agent
 agent_executor("What did Xingyu do in the arduino project?")
 
-# while True:
-#     user_input = input("question: ")
-#     if user_input == "exit":
-#         break
-#     agent_executor.run(user_input)
+while True:
+    user_input = input("question: ")
+    if user_input == "exit":
+        break
+    agent_executor.run(user_input)
