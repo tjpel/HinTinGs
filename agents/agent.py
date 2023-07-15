@@ -36,6 +36,11 @@ qa_chain = RetrievalQA.from_chain_type(llm=llm, chain_type="stuff",
                                        retriever=docsearch.as_retriever(search_kwargs={"k": 2}),
                                        return_source_documents=True)
 
+def run_qa(question: str):
+    res = qa_chain({"query" : question})
+    output = f"answer: {res['result']}\n\nsource: {res['source_documents'][0]}"
+    return output 
+
 tools = [
     Tool(
         name = "Search",
@@ -49,7 +54,7 @@ tools = [
     ),
     Tool(
         name="QA-System",
-        func=qa_chain,
+        func=run_qa,
         description="useful for when asking questions about documents that you have uploaded"
     ),
     Tool(
@@ -62,7 +67,14 @@ tools = [
 agent = initialize_agent(tools, llm, agent=AgentType.OPENAI_FUNCTIONS, verbose=True)
 
 
-agent.run("Create an image of a dog wearing a hat")
+print("Welcome to the HinTinGs.ai 🤖")
+while True:
+    user_input = input("user: ")
+    if user_input.lower() == "exit":
+        break
+    agent.run(user_input)
+
+# agent.run("Create an image of a dog wearing a hat")
 # agent.run("Based on the document, What is happening in New York?")
 # agent.run("What is the weather today in Amherst Massachusetts?")
 # agent.run("Based on the document, what is the langchain?")
