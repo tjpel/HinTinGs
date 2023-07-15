@@ -56,8 +56,9 @@ def query():
     if request.method == 'POST':
         req = request.get_json()
         question = req['question'] # This is the question that the user asked in the form
-        # answer = hintings.query(question)
-        answer = "your question was not important so here\'s a random answer"
+        answer = hintings.query(question)
+        
+        # answer = "your question was not important so here\'s a random answer"
         # source_list = get_sources(question)
         source_list = ["source1"]
         return make_response(
@@ -75,45 +76,17 @@ def documents():
     if not files or len(request.files) < 1:
         return Response('No files received', status=400)
 
-    #print("Request Files: ", request.files)
-    # print("Files Key: ", files)
-    # print("Reading Files: ", files.read())
-    print("Before saving files")
-    print("Files in folder: \n", os.listdir('files'))
     for file in files:
         print("File: ", file)
         file.save(os.path.join('files', secure_filename(file.filename)))
-    print("Files saved to files folder")
     
-    print("Files in folder: ", os.listdir('files'))
     
-    # data = []
-    # sources = []
-    # ext = os.path.splitext(file[0])[1]
-    # if ext.lower() in ['.md', '.txt']:
-    #     data.append(str(file.read(), encoding='utf-8', errors='ignore'))
-    #     sources.append(file.name)
-    # text_splitter = CharacterTextSplitter(chunk_size=1500, separator='\n')
-    # docs = []
-    # metadatas = []
-    # for i, d in enumerate(data):
-    #     splits = text_splitter.split_text(d)
-    #     docs.extend(splits)
-    #     metadatas.extend([{'source': sources[i]}] * len(splits))
-
-    # embeddings = embedding.embed_documents(docs)
-
-    # SourceDocument.objects.all().delete()
-
-    # for i in range(len(embeddings)):
-    #     SourceDocument.objects.create(
-    #         name=metadatas[i]['source'],
-    #         content=docs[i],
-    #         embedding=embeddings[i]
-    #     )
-    
+    # tells bot to read in the entire directory of input files
     hintings.load_docs()
+    
+    # tells the bot to transform the documents into embeddings
     hintings.process_docs()
+    
     return make_response(jsonify('files received! ready to be queried'), 200)
 
 
