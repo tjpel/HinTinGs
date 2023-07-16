@@ -59,9 +59,15 @@ def query():
         
         answer, source = hintings.query(question)
         # answer = "your question was not important so here\'s a random answer"
-        
-        # source_list = get_sources(question)
-        source_list = [source]
+        print("Answer: ", answer)
+    
+        source_list = []
+        source_list.append(
+            {
+            'name': source[5:],
+            'id': 0,
+            'extract': 'this is totally text from the source'
+        })
         
         return make_response(
             jsonify(question=question,

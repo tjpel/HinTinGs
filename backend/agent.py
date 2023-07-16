@@ -54,7 +54,7 @@ class Bot:
         #     ),
         #     Tool(
         #         name="QA-System",
-        #         func=run_qa,
+        #         func=query,
         #         description="useful for when asking questions about documents that you have uploaded"
         #     ),
         #     Tool(

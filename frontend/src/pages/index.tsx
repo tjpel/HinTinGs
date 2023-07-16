@@ -175,7 +175,7 @@ function IndexPage() {
 							<h4 className='mb-2 text-2xl font-bold text-white'>
 								Sources
 							</h4>
-							<ul>
+							<ul className='text-white'>
 								{sourcesJSX}
 							</ul>
 						</div>
