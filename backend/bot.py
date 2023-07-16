@@ -12,8 +12,8 @@ from langchain.agents import AgentType
 from langchain.chat_models import ChatOpenAI
 from langchain.document_loaders import DirectoryLoader
 
-# from nemoguardrails import LLMRails, RailsConfig
-# from nemoguardrails.actions import action
+from nemoguardrails import LLMRails, RailsConfig
+from nemoguardrails.actions import action
 
 from gradio_tools.tools import StableDiffusionTool
 
@@ -36,10 +36,10 @@ class Bot:
         self.files_path = files_path
         self.config_path = config_path
 
-        # # set up NeMo rails
-        # config = RailsConfig.from_path(config_path)
-        # # initialize NeMo App
-        # self.app = LLMRails(config)
+        # set up NeMo rails
+        config = RailsConfig.from_path(config_path)
+        # initialize NeMo App
+        self.app = LLMRails(config)
 
         #initilize search
         self.search = SerpAPIWrapper()
@@ -50,9 +50,9 @@ class Bot:
         # create a memory object, which tracks the conversation history
         self.memory = ConversationBufferWindowMemory(k=3, memory_key="chat_history",return_messages=True)
 
-    # @action()
-    # async def query_base_chain(self, q: str):
-    #     return self.qa({"question": q})["answer"] 
+    @action()
+    async def query_base_chain(self, q: str):
+        return self.qa({"question": q})["answer"] 
 
     def query(self, q: str) -> str:
         print("\nquery: ", q)
@@ -71,17 +71,17 @@ class Bot:
         embeddings = OpenAIEmbeddings()
         docsearch = Chroma.from_documents(texts, embeddings)
 
-        # # creates the QA chain, should reference to the source
-        # self.qa = ConversationalRetrievalChain.from_llm(
-        #     llm=self.app.llm,
-        #     retriever=docsearch.as_retriever(search_kwargs={"k": 2}),
-        #     chain_type="stuff",
-        #     # verbose=True,
-        #     memory=self.memory,
-        # )
+        # creates the QA chain, should reference to the source
+        self.qa = ConversationalRetrievalChain.from_llm(
+             llm=self.app.llm,
+             retriever=docsearch.as_retriever(search_kwargs={"k": 2}),
+             chain_type="stuff",
+            # verbose=True,
+            memory=self.memory,
+         )
 
-        # #allows NeMo app to query our self.qa (ConversationalRetrievalChain)
-        # self.app.register_action(self.query_base_chain, name="main_chain")
+        #allows NeMo app to query our self.qa (ConversationalRetrievalChain)
+        self.app.register_action(self.query_base_chain, name="main_chain")
 
         tools = [
             Tool(
@@ -94,11 +94,11 @@ class Bot:
                 func=self.llm_math_chain.run,
                 description="useful for when you need to answer questions about math"
             ),
-            # Tool(
-            #     name="QA-System",
-            #     func=self.app.generate,
-            #     description="useful for when asking questions about documents that you have uploaded"
-            # ),
+            Tool(
+                name="QA-System",
+                func=self.app.generate,
+                description="useful for when asking questions about documents that you have uploaded"
+            ),
             Tool(
                 name="Diffusion",
                 func=StableDiffusionTool().langchain.run,
