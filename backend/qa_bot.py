@@ -1,21 +1,13 @@
 from dotenv import load_dotenv
 
-from langchain import LLMMathChain, SerpAPIWrapper, OpenAI, SQLDatabase, SQLDatabaseChain
+from langchain import LLMMathChain, SerpAPIWrapper
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.vectorstores import Chroma
 from langchain.text_splitter import CharacterTextSplitter
-from langchain.chains import ConversationalRetrievalChain, RetrievalQA
-from langchain.memory import ConversationBufferWindowMemory
+from langchain.chains import RetrievalQA
 from langchain.document_loaders import DirectoryLoader
-from langchain.agents import initialize_agent, Tool
-from langchain.agents import AgentType
 from langchain.chat_models import ChatOpenAI
 from langchain.document_loaders import DirectoryLoader
-
-# from nemoguardrails import LLMRails, RailsConfig
-# from nemoguardrails.actions import action
-
-from gradio_tools.tools import StableDiffusionTool
 
 
 # load environmental variables
@@ -41,31 +33,6 @@ class Bot:
         self.llm_math_chain = LLMMathChain.from_llm(llm=self.llm, verbose=True)
         
         self.qa_chain = None
-        # self.tools = [
-        #     Tool(
-        #         name = "Search",
-        #         func=search.run,
-        #         description="useful for when you need to answer questions about current events. You should ask targeted questions"
-        #     ),
-        #     Tool(
-        #         name="Calculator",
-        #         func=llm_math_chain.run,
-        #         description="useful for when you need to answer questions about math"
-        #     ),
-        #     Tool(
-        #         name="QA-System",
-        #         func=query,
-        #         description="useful for when asking questions about documents that you have uploaded"
-        #     ),
-        #     Tool(
-        #         name="Diffusion",
-        #         func=StableDiffusionTool().langchain.run,
-        #         description="useful for when the user asks to create an image based on a prompt"
-        #     )
-        # ]
-        
-        # self.agent = initialize_agent(self.tools, self.llm, agent=AgentType.OPENAI_FUNCTIONS, verbose=True)
-
 
     def query(self, q: str) -> str:
         res = self.qa_chain({"query": q})

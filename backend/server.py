@@ -5,7 +5,7 @@ from flask_cors import CORS
 import os, shutil
 import json
 #import bot as bot
-import agent as bot
+import qa_bot as bot
 
 def get_base_url(port:int) -> str:
     '''
