@@ -18,12 +18,13 @@ google-search-results==2.4.2
 gradio_client==0.2.9
 gradio-tools==0.0.9
 idna==3.4
-langchain==0.0.227
 lxml==4.9.2
 marshmallow==3.19.0
 marshmallow-enum==1.5.1
 multidict==6.0.4
 mypy-extensions==1.0.0
+nemoguardrails==0.3.0
+langchain==0.0.234
 numpy==1.24.2
 openai==0.27.2
 packaging==23.0
