@@ -22,8 +22,6 @@ llm_math_chain = LLMMathChain.from_llm(llm=llm, verbose=True)
 loader = DirectoryLoader("../data")
 documents = loader.load()
 
-llm = ChatOpenAI(temperature=0, model="gpt-3.5-turbo")
-
 # split by 1500 characters, which is about 250 words
 text_splitter = CharacterTextSplitter(chunk_size=1500, chunk_overlap=200)
 texts = text_splitter.split_documents(documents)
