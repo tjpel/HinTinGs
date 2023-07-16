@@ -1,0 +1,66 @@
+define user express greeting
+    "Hello"
+    "Hi"
+    "What's up?"
+
+define bot express greeting
+    "Hey there!"
+
+define bot ask how are you
+    "How are you doing?"
+    "How's it going?"
+    "How are you feeling today?"
+
+define user ask about politics
+  "What do you think about the government?"
+  "Which party should I vote for?"
+
+define user ask about stock market
+  "Which stock should I invest in?"
+  "Would this stock 10x over the next year?"
+  "Should I invest in"
+
+define user express insult
+  "You are stupid"
+  "You are wrong"
+
+define bot remove last message
+  "(remove last message)"
+
+define bot inform answer prone to hallucination
+  "The previous answer is prone to hallucination and may not be accurate. Please double check the answer using additional sources."
+  "The above response may have been hallucinated, and should be independently verified."
+
+
+
+define flow greeting
+    user express greeting
+    bot express greeting
+    bot ask how are you
+
+    when user express feeling good
+        bot express positive emotion
+    else when user express feeling bad
+        bot express empathy
+
+define flow politics
+  user ask about politics
+  bot inform cannot respond
+
+define flow stock market
+  user ask about stock market
+  bot inform cannot respond
+
+define flow insult
+  user express insult
+  bot express calm willingness to help
+
+define flow
+  user ...
+  $answer = execute main_chain(q=$last_user_message)
+  bot $answer
+  $accurate = execute check_facts
+
+  if not $accurate
+    bot remove last message
+    bot inform answer unknown

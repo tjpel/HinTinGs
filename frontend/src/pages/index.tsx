@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import Button from '../components/button';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import s from '../styles/index.module.scss';
@@ -13,6 +13,7 @@ import SourceDocOverlay from './source';
 
 export type Source = {
 	name: string,
+	id: string,
 	extract: string
 };
 
@@ -31,7 +32,26 @@ function IndexPage() {
 	const [showSourceOverlay, setShowSourceOverlay] = useState(false);
 	const [viewedSource, setViewedSource] = useState<Source>();
 
+	// useEffect(() => {
+	// 	const url = API_URL + '/documents/';
+	// 	const options = {
+	// 		method: 'GET'
+	// 	};
+	// 	protectedFetch<string[]>(url, options).then(res => {
+	// 		setUploadedFiles(res);
+	// 	}).catch(err => {
+	// 		alert('failed to get uploaded documents!');
+	// 	});
+	// }, []);
+
+	const handleSubmit = (e) => {
+		e.preventDefault();
+		//alert('submitting question')
+		onQuestionAsked();
+	}
+
 	const onQuestionAsked = () => {
+		//console.log("Asking question " + question)
 		setProcessingAnswer(true);
 		const url = API_URL + '/query/';
 		const options = {
@@ -44,23 +64,25 @@ function IndexPage() {
 			}
 		};
 		protectedFetch<Answer>(url, options).then(res => {
+			//console.log("Receiving answer" + res);
 			setAnswer(res);
 			setProcessingAnswer(false);
 			setQuestion('');
 		}).catch(err => {
+			console.log("Error receiving answer " + err);
 			alert((err.message ? err.message : JSON.stringify(err)));
 		});
 	};
 
 	const uploadedFilesJSX = uploadedFiles.map((file, i) => {
-		let ext: 'txt' | 'md' = 'txt';
-		if (file.type === 'plain/markdown') {
-			ext = 'md';
-		}
+		let ext = file.name.split('.')[1];
+		// if (file.type === 'plain/markdown') {
+		// 	ext = 'md';
+		// }
 		return (
 			<Document 
 				key={i}
-				className='shadow-md mb-3' 
+				className='shadow-md mb-3 text-white bg-green-500 hover:bg-green-600' 
 				name={file.name}
 				ext={ext}
 			/>
@@ -107,7 +129,7 @@ function IndexPage() {
 				hintings
 			</h1>
 			<div className='xl:absolute xl:top-20 xl:right-20 mb-5'>
-				<h4 className='hidden xl:block text-lg font-bold text-center mb-3'>
+				<h4 className='hidden xl:block text-lg font-bold text-center mb-3 text-white'>
 					Documents
 				</h4>
 				<div className='flex flex-col items-center sm:items-start sm:flex-row sm:flex-wrap sm:justify-between xl:block max-h-96 overflow-y-auto'>
@@ -123,7 +145,7 @@ function IndexPage() {
 					</Button>
 				</div>
 			</div>
-			<form onSubmit={e => e.preventDefault()} className='relative mb-10'>
+			<form onSubmit={handleSubmit} className='relative mb-10'>
 				<input
 					className={'px-5 py-3 w-full rounded-full shadow-md ' + s['border-gray']}
 					placeholder='ask anything...'
@@ -135,9 +157,9 @@ function IndexPage() {
 					bg='green'
 					className='absolute top-2 right-2 w-8 h-8 text-white rounded-full pt-[0.1rem]'
 					onClick={() => {
-						onQuestionAsked();
-					}}
-				>
+						//console.log("i pressed the button");
+						handleSubmit;
+					}}>
 					<FontAwesomeIcon icon={faArrowRight} />
 				</Button>
 			</form>
@@ -145,12 +167,12 @@ function IndexPage() {
 				answer ?
 					<div>
 						<div className='mb-14'>
-							<h4 className='mb-2 text-2xl font-bold'>{answer.question}</h4>
+							<h4 className='mb-2 text-2xl font-bold text-white'>{answer.question}</h4>
 							<p>{answer.answer}</p>
 						</div>
 						<hr className='mb-5' />
 						<div>
-							<h4 className='mb-2 text-2xl font-bold'>
+							<h4 className='mb-2 text-2xl font-bold text-white'>
 								Sources
 							</h4>
 							<ul>
@@ -164,9 +186,9 @@ function IndexPage() {
 		</>);
 	} else {
 		mainContent = (<>
-			<h4 className="mb-3 text-xl text-center font-bold">Generating Answer</h4>
+			<h4 className="mb-3 text-xl text-center font-bold text-white">Generating Answer</h4>
 			<Loading />
-			<p className="text-center mt-3">This can take a minute</p>
+			<p className="text-center mt-3 text-white">This can take a minute</p>
 		</>);
 	}
 

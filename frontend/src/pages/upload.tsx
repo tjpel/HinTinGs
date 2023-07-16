@@ -12,15 +12,15 @@ type Props = {
 	onUploadSuccess: (files: File[]) => void
 };
 
-const ALLOWED_FILES = ['text/plain', 'text/markdown'];
+const ALLOWED_FILES = ['text/plain', 'text/markdown', 'application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/vnd.oasis.opendocument.text', 'application/rtf', 'application/epub+zip', 'application/x-fictionbook+xml', 'application/x-mobipocket-ebook', 'application/x-latex', 'application/x-tex'];
 
 function UploadOverlay({ show, onUploadSuccess }: Props) {
 	const [files, setFiles] = useState<File[]>([]);
 	const [processingUpload, setProcessingUpload] = useState(false);
 
 	const FileInput = useRef<HTMLInputElement>(null);
-	console.log("VITE_API_URL is " + import.meta.env.VITE_API_URL);
-	console.log("API URL is " + API_URL);
+	//console.log("VITE_API_URL is " + import.meta.env.VITE_API_URL);
+	//console.log("API URL is " + API_URL);
 
 	const filesJSX = [];
 	if (files.length) {
@@ -51,7 +51,6 @@ function UploadOverlay({ show, onUploadSuccess }: Props) {
 			method: 'POST',
 			body: form
 		};
-		alert('Uploading files to server');
 		console.log('Uploading files to server');
 		console.log(files);		
 		protectedFetch(url, options).then(() => {
@@ -70,7 +69,7 @@ function UploadOverlay({ show, onUploadSuccess }: Props) {
 	let mainContent;
 	if (processingUpload) {
 		mainContent = (<>
-			<h4 className="mb-3 text-xl text-center font-bold">Uploading To Server</h4>
+			<h4 className="mb-3 text-xl text-center font-bold text-white">Uploading To Server</h4>
 			<Loading />
 			<p className="text-center mt-3">Thank you for your patience</p>
 		</>);
