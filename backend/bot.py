@@ -106,7 +106,6 @@ class Bot:
             )
         ]
 
-        #TODO: This is throwing an error on OPENAI_FUNCTIONS, see discord
         self.agent = initialize_agent(tools, ChatOpenAI(temperature=0, model_name="gpt-3.5-turbo-0613"), agent=AgentType.OPENAI_FUNCTIONS, verbose=True) #TODO: This is throwing an error 
 
 """
