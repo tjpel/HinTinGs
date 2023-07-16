@@ -1,5 +1,5 @@
 models:
-- type: main
-  engine: openai
-  model: gpt-3.5-turbo
-  temperature: 0
+  - type: main
+    engine: openai
+    model: gpt-3.5-turbo-0613
+    temperature: 0
