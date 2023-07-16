@@ -4,8 +4,8 @@ from werkzeug.datastructures import FileStorage
 from flask_cors import CORS
 import os, shutil
 import json
-#import bot as bot
-import qa_bot as bot
+import bot as bot
+#import qa_bot as bot
 
 def get_base_url(port:int) -> str:
     '''
@@ -57,17 +57,19 @@ def query():
         req = request.get_json()
         question = req['question'] # This is the question that the user asked in the form
         
-        answer, source = hintings.query(question)
+        answer = hintings.query(question)
         # answer = "your question was not important so here\'s a random answer"
         print("Answer: ", answer)
-    
+
         source_list = []
-        source_list.append(
-            {
-            'name': source[5:],
-            'id': 0,
-            'extract': 'this is totally text from the source'
-        })
+        if hintings.lastSource:
+            source_list.append(
+                {
+                'name': hintings.lastSource,
+                'id': 0,
+                'extract': 'this is totally text from the source'
+            })
+            hintings.lastSource = None
         
         return make_response(
             jsonify(question=question,
