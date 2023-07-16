@@ -6,7 +6,9 @@ function Footer() {
 		<div className={s.footer + ' py-5 w-full sm:fixed sm:bottom-0'}>
 			<div className='container max-w-2xl mx-auto px-5'>
 				<p className={'mb-3 ' + s['white']}>
-					Built on top of quads (query any data set), taking q&a to the next level. quads ai is not liable for content generated. do not enter personal information.
+					HiNTinGs is an interface to query documents with the power of chained LLMs. <br></br>
+					From a team of developers who <i>Have Never Touched Grass</i>™<br></br> 
+					hintings ai is not liable for content generated. do not enter personal information.
 				</p>
 				<hr className={'mb-3 ' + s['border-gray-dark']} />
 				<div>
