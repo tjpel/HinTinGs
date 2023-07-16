@@ -1,6 +1,7 @@
 from bot import Bot
 import pandas as pd
-from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
+#from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
+from sentence_transformers import SentenceTransformer, util
 import time
 import sys
 
