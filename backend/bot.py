@@ -10,11 +10,8 @@ from langchain.document_loaders import DirectoryLoader
 from langchain.agents import initialize_agent, Tool
 from langchain.agents import AgentType
 from langchain.chat_models import ChatOpenAI
-from langchain.document_loaders import DirectoryLoader
-
 from nemoguardrails import LLMRails, RailsConfig
 from nemoguardrails.actions import action
-
 from gradio_tools.tools import StableDiffusionTool
 
 
