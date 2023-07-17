@@ -1,6 +1,6 @@
 from dotenv import load_dotenv
 
-from langchain import LLMMathChain, SerpAPIWrapper, OpenAI, SQLDatabase, SQLDatabaseChain
+from langchain import LLMMathChain, SerpAPIWrapper
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.vectorstores import Chroma
 from langchain.text_splitter import CharacterTextSplitter
@@ -41,14 +41,16 @@ class Bot:
         # initialize NeMo App
         self.app = LLMRails(config)
 
-        #initilize search
+        # initilize search
         self.search = SerpAPIWrapper()
 
-        #initilize math chain
+        # initilize math chain
         self.llm_math_chain = LLMMathChain.from_llm(self.app.llm, verbose=True)
 
         # create a memory object, which tracks the conversation history
-        self.memory = ConversationBufferWindowMemory(k=3, memory_key="chat_history",return_messages=True)
+        self.memory = ConversationBufferWindowMemory(
+            k=3, memory_key="chat_history", return_messages=True
+        )
 
         self.lastSource = None
 
@@ -56,60 +58,81 @@ class Bot:
     async def query_base_chain(self, q: str):
         res = self.qa({"query": q})
         answer = res["result"]
-        self.lastSource = res["source_documents"][0].metadata['source']
+        self.lastSource = res["source_documents"][0].metadata["source"]
         return answer
 
     def query(self, q: str) -> str:
         return self.agent.run(q)
-    
+
     def load_docs(self):
         self.loader = DirectoryLoader(self.files_path)
         self.documents = self.loader.load()
 
-    def run_qa(self, q: str): 
-        ans = self.app.generate(q)
-        res = f"Answer: {ans}\nSource: {self.lastSource}\n"
+    # def run_qa(self, q: str):
+    #     ans = self.app.generate(q)
+    #     res = f"Answer: {ans}\nSource: {self.lastSource}\n"
+    #     return res
+
+    def run_serpapi(self, q: str) -> str:
+        res = self.search.run(q)
+        self.lastSource = "web search"
+        return res
+
+    def run_diffusion(self, q: str) -> str:
+        path = StableDiffusionTool().langchain.run(q)
+        self.lastSource = "stable diffusion"
+        return path
+
+    def run_math(self, q: str) -> str:
+        res = self.llm_math_chain.run(q)
+        self.lastSource = "LLM math"
         return res
 
     def process_docs(self):
         text_splitter = CharacterTextSplitter(chunk_size=1500, chunk_overlap=0)
         texts = text_splitter.split_documents(self.documents)
-        
+
         embeddings = OpenAIEmbeddings()
         docsearch = Chroma.from_documents(texts, embeddings)
 
         # creates the QA chain, should reference to the source
-        self.qa = RetrievalQA.from_chain_type(llm=self.app.llm, chain_type="stuff", 
-                                       retriever=docsearch.as_retriever(search_kwargs={"k": 2}),
-                                       return_source_documents=True)
+        self.qa = RetrievalQA.from_chain_type(
+            llm=self.app.llm,
+            chain_type="stuff",
+            retriever=docsearch.as_retriever(search_kwargs={"k": 2}),
+            return_source_documents=True,
+        )
 
-        #allows NeMo app to query our self.qa (ConversationalRetrievalChain)
+        # allows NeMo app to query our self.qa (ConversationalRetrievalChain)
         self.app.register_action(self.query_base_chain, name="main_chain")
 
         tools = [
             Tool(
-                name = "Search",
-                func=self.search.run,
-                description="useful for when you need to answer questions about current events. You should ask targeted questions"
+                name="Search",
+                func=self.run_serpapi,
+                description="useful for when you need to answer questions about current events. You should ask targeted questions",
             ),
             Tool(
                 name="Calculator",
-                func=self.llm_math_chain.run,
-                description="useful for when you need to answer questions about math"
+                func=self.run_math,
+                description="useful for when you need to answer questions about math",
             ),
             Tool(
                 name="QA-System",
-                func=self.run_qa,
-                description="useful for when asking questions about documents that you have uploaded"
+                func=self.app.generate,
+                description="useful for when asking questions about documents that you have uploaded",
             ),
             Tool(
                 name="Diffusion",
-                func=StableDiffusionTool().langchain.run,
-                description="useful for when the user asks to create an image based on a prompt"
-            )
+                func=self.run_diffusion,
+                description="useful for when the user asks to create an image based on a prompt",
+            ),
         ]
 
-        self.agent = initialize_agent(tools, self.app.llm, agent=AgentType.OPENAI_FUNCTIONS, verbose=True)
+        self.agent = initialize_agent(
+            tools, self.app.llm, agent=AgentType.OPENAI_FUNCTIONS, verbose=True
+        )
+
 
 """
     def clear_memory(self):
@@ -128,10 +151,10 @@ class Bot:
 # bot.load_docs()
 # bot.process_docs()
 # bot.agent.run("Based on the documents, what is langchain")
+# print(bot.lastSource)
 # bot.agent.run("Based on the documents, what is happening in NYC?")
+# print(bot.lastSource)
 # bot.agent.run("What is the weather at Reading Massachusetts?")
+# print(bot.lastSource)
 # bot.agent.run("Create a cute picture of a raccoon, digital art")
-
-
-
-
+# print(bot.lastSource)
