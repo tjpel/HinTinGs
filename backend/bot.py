@@ -45,7 +45,7 @@ class Bot:
         self.search = SerpAPIWrapper()
 
         #initilize math chain
-        self.llm_math_chain = LLMMathChain.from_llm(ChatOpenAI(temperature=0, model_name="gpt-3.5-turbo-0613"), verbose=True)
+        self.llm_math_chain = LLMMathChain.from_llm(self.app.llm, verbose=True)
 
         # create a memory object, which tracks the conversation history
         self.memory = ConversationBufferWindowMemory(k=3, memory_key="chat_history",return_messages=True)
@@ -106,7 +106,7 @@ class Bot:
             )
         ]
 
-        self.agent = initialize_agent(tools, ChatOpenAI(temperature=0, model_name="gpt-3.5-turbo-0613"), agent=AgentType.OPENAI_FUNCTIONS, verbose=True) #TODO: This is throwing an error 
+        self.agent = initialize_agent(tools, self.app.llm, agent=AgentType.OPENAI_FUNCTIONS, verbose=True) #TODO: This is throwing an error 
 
 """
     def clear_memory(self):
@@ -120,3 +120,4 @@ class Bot:
             memory=self.memory,
         )
 """
+
