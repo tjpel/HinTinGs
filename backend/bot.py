@@ -124,13 +124,13 @@ class Bot:
         )
 """
 
-bot = Bot("../data")
-bot.load_docs()
-bot.process_docs()
-bot.agent.run("Based on the documents, what is langchain")
-bot.agent.run("Based on the documents, what is happening in NYC?")
-bot.agent.run("What is the weather at Reading Massachusetts?")
-bot.agent.run("Create a cute picture of a raccoon, digital art")
+# bot = Bot("../data")
+# bot.load_docs()
+# bot.process_docs()
+# bot.agent.run("Based on the documents, what is langchain")
+# bot.agent.run("Based on the documents, what is happening in NYC?")
+# bot.agent.run("What is the weather at Reading Massachusetts?")
+# bot.agent.run("Create a cute picture of a raccoon, digital art")
 
 
 
