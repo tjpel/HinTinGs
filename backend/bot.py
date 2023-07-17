@@ -4,7 +4,7 @@ from langchain import LLMMathChain, SerpAPIWrapper, OpenAI, SQLDatabase, SQLData
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.vectorstores import Chroma
 from langchain.text_splitter import CharacterTextSplitter
-from langchain.chains import ConversationalRetrievalChain
+from langchain.chains import RetrievalQA
 from langchain.memory import ConversationBufferWindowMemory
 from langchain.document_loaders import DirectoryLoader
 from langchain.agents import initialize_agent, Tool
@@ -50,19 +50,26 @@ class Bot:
         # create a memory object, which tracks the conversation history
         self.memory = ConversationBufferWindowMemory(k=3, memory_key="chat_history",return_messages=True)
 
+        self.lastSource = None
+
     @action()
     async def query_base_chain(self, q: str):
-        return self.qa({"question": q})["answer"] 
+        res = self.qa({"query": q})
+        answer = res["result"]
+        self.lastSource = res["source_documents"][0].metadata['source']
+        return answer
 
     def query(self, q: str) -> str:
-        print("\nquery: ", q)
-        res = self.agent.run(q)
-        print("answer: ", res)
-        return res
+        return self.agent.run(q)
     
     def load_docs(self):
         self.loader = DirectoryLoader(self.files_path)
         self.documents = self.loader.load()
+
+    def run_qa(self, q: str): 
+        ans = self.app.generate(q)
+        res = f"Answer: {ans}\nSource: {self.lastSource}\n"
+        return res
 
     def process_docs(self):
         text_splitter = CharacterTextSplitter(chunk_size=1500, chunk_overlap=0)
@@ -72,13 +79,9 @@ class Bot:
         docsearch = Chroma.from_documents(texts, embeddings)
 
         # creates the QA chain, should reference to the source
-        self.qa = ConversationalRetrievalChain.from_llm(
-             llm=self.app.llm,
-             retriever=docsearch.as_retriever(search_kwargs={"k": 2}),
-             chain_type="stuff",
-            # verbose=True,
-            memory=self.memory,
-         )
+        self.qa = RetrievalQA.from_chain_type(llm=self.app.llm, chain_type="stuff", 
+                                       retriever=docsearch.as_retriever(search_kwargs={"k": 2}),
+                                       return_source_documents=True)
 
         #allows NeMo app to query our self.qa (ConversationalRetrievalChain)
         self.app.register_action(self.query_base_chain, name="main_chain")
@@ -96,7 +99,7 @@ class Bot:
             ),
             Tool(
                 name="QA-System",
-                func=self.app.generate,
+                func=self.run_qa,
                 description="useful for when asking questions about documents that you have uploaded"
             ),
             Tool(
@@ -106,7 +109,7 @@ class Bot:
             )
         ]
 
-        self.agent = initialize_agent(tools, self.app.llm, agent=AgentType.OPENAI_FUNCTIONS, verbose=True) #TODO: This is throwing an error 
+        self.agent = initialize_agent(tools, self.app.llm, agent=AgentType.OPENAI_FUNCTIONS, verbose=True)
 
 """
     def clear_memory(self):
@@ -120,4 +123,15 @@ class Bot:
             memory=self.memory,
         )
 """
+
+bot = Bot("../data")
+bot.load_docs()
+bot.process_docs()
+bot.agent.run("Based on the documents, what is langchain")
+bot.agent.run("Based on the documents, what is happening in NYC?")
+bot.agent.run("What is the weather at Reading Massachusetts?")
+bot.agent.run("Create a cute picture of a raccoon, digital art")
+
+
+
 
