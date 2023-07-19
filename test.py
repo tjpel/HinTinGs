@@ -1,11 +1,10 @@
 from bot import Bot
 import pandas as pd
-#from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
+
+# from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
 from sentence_transformers import SentenceTransformer, util
 import time
 import sys
-
-
 
 
 PATH_TO_TESTING_CSV = "testing_suite/testing_results.csv"
@@ -20,6 +19,9 @@ SIMULARITY_THRESHOLD = 0.75
 
 
 b = Bot("data")
+b.load_docs()
+b.process_docs()
+
 if len(sys.argv) > 1:
     for arg in sys.argv[1:]:
         b.query(arg)
@@ -30,7 +32,7 @@ test = pd.read_csv(PATH_TO_TESTING_CSV)
 if LIMIT_QUESTIONS:
     test = test.head(MAX_QUESTIONS_TO_TEST)
 
-model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
+model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
 
 last_input = ""
 
@@ -43,17 +45,16 @@ for index, row in test.iterrows():
     if VERBOSE:
         print(f"Current Index: {index}")
 
-    # dump old conversation if talking about new document
-    if last_input != row["Input File"]:
-        b.clear_memory()
+    # # dump old conversation if talking about new document
+    # if last_input != row["Input File"]:
+    #     b.clear_memory()
 
     # .iloc mess is because updating row doesn't update test
     test.iloc[
         index, test.columns.get_loc("HiNTinGs Answer")
     ] = hintings_answer = b.query(row["Question"])
 
-
-    embedding_human = model.encode(row['Human Answer'], convert_to_tensor=True)
+    embedding_human = model.encode(row["Human Answer"], convert_to_tensor=True)
     embedding_bot = model.encode(hintings_answer, convert_to_tensor=True)
 
     simularity = util.pytorch_cos_sim(embedding_bot, embedding_human)
