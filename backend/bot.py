@@ -11,7 +11,7 @@ from langchain.agents import initialize_agent, Tool
 from langchain.agents import AgentType
 from langchain.chat_models import ChatOpenAI
 from nemoguardrails import LLMRails, RailsConfig
-from nemoguardrails.actions import action
+from nemoguardrails.actions import action, fact_checking, hallucination
 from gradio_tools.tools import StableDiffusionTool
 
 
@@ -100,8 +100,10 @@ class Bot:
             return_source_documents=True,
         )
 
-        # allows NeMo app to query our self.qa (ConversationalRetrievalChain)
+        # allows NeMo app to query our QA system
         self.app.register_action(self.query_base_chain, name="main_chain")
+        self.app.register_action(fact_checking, name="fact_checking")
+        self.app.register_action(hallucination, name="hallucination")
 
         tools = [
             Tool(
@@ -143,15 +145,3 @@ class Bot:
             memory=self.memory,
         )
 """
-
-# bot = Bot("../data")
-# bot.load_docs()
-# bot.process_docs()
-# bot.agent.run("Based on the documents, what is langchain")
-# print(bot.lastSource)
-# bot.agent.run("Based on the documents, what is happening in NYC?")
-# print(bot.lastSource)
-# bot.agent.run("What is the weather at Reading Massachusetts?")
-# print(bot.lastSource)
-# bot.agent.run("Create a cute picture of a raccoon, digital art")
-# print(bot.lastSource)
