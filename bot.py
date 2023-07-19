@@ -1,24 +1,20 @@
 from langchain.chains import RetrievalQA
 from dotenv import load_dotenv
-
 from langchain import LLMMathChain, SerpAPIWrapper, OpenAI, SQLDatabase, SQLDatabaseChain
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.vectorstores import Chroma
 from langchain.text_splitter import CharacterTextSplitter
-from langchain.chains import ConversationalRetrievalChain
 from langchain.memory import ConversationBufferWindowMemory
 from langchain.document_loaders import DirectoryLoader
 from langchain.agents import initialize_agent, Tool
 from langchain.agents import AgentType
-from langchain.chat_models import ChatOpenAI
 from langchain.document_loaders import DirectoryLoader
-
 from nemoguardrails import LLMRails, RailsConfig
 from nemoguardrails.actions import action
-
 from gradio_tools.tools import StableDiffusionTool
-
 from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
+
+load_dotenv()
 
 class Bot:
     def __init__(self, files_path: str, config_path: str = "config/base"):
@@ -41,14 +37,13 @@ class Bot:
 
         # initilize search
         self.search = SerpAPIWrapper()
-
-        # initilize math chain
         self.llm_math_chain = LLMMathChain.from_llm(self.app.llm, verbose=True)
+        self.agent = None
 
         # create a memory object, which tracks the conversation history
-        self.memory = ConversationBufferWindowMemory(
-            k=3, memory_key="chat_history", return_messages=True
-        )
+        # self.memory = ConversationBufferWindowMemory(
+        #     k=3, memory_key="chat_history", return_messages=True
+        # )
 
         self.lastSource = None
 
@@ -89,9 +84,11 @@ class Bot:
         outputs = self.model.generate(**inputs, max_length=3)
         res = self.tokenizer.batch_decode(outputs, skip_special_tokens=True)
 
+        # if there is no context, we run a web search
         if res == ['no']:
             print("There is no answer found in the documents. Here is some information from the web:")
             search = SerpAPIWrapper()
+            self.lastSource = "web search, no info from documents"
             return search.run(q)
         else:
             print('Found in uploaded documents:')
@@ -145,7 +142,7 @@ class Bot:
             Tool(
                 name="QA-System",
                 func=self.run_qa,
-                description="useful for when asking questions about documents that you have uploaded",
+                description="useful for when you ask questions about general questions, especially based on the documents",
             ),
             Tool(
                 name="Diffusion",

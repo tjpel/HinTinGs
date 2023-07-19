@@ -7,12 +7,16 @@ import sys
 
 
 b = Bot("data")
-b.query("What is langchain")
-b.query("Elaborate?")
-b.clear_memory()
+b.load_docs()
+b.process_docs()
+
+b.query("Based on the document, what is langchain")
+print("Source: ", b.lastSource)
 b.query("Where did the fire start?")
-b.query("Who did what on the arduino project?")
-b.query("You are dumb")
+print("Source: ", b.lastSource)
+b.query("Based on the document, who did Xingyu do on the arduino project?")
+print("Source: ", b.lastSource)
+
 # PATH_TO_TESTING_CSV = "testing_suite/testing_results.csv"
 
 # # LIMIT_QUESTIONS limits the amount of questions asked to MAX_QUESTIONS_TO_TEST. If you enable LIMIT_QUESTIONS, your results will not be saved to PATH_TO_TRAINING_CSV.
