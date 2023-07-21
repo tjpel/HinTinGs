@@ -6,16 +6,24 @@ import time
 import sys
 
 
-b = Bot("data")
-b.load_docs()
-b.process_docs()
+# testing the qa integration 🦾
 
-b.query("Based on the document, what is langchain")
-print("Source: ", b.lastSource)
-b.query("Where did the fire start?")
-print("Source: ", b.lastSource)
-b.query("Based on the document, who did Xingyu do on the arduino project?")
-print("Source: ", b.lastSource)
+bot = Bot("data")
+bot.load_docs()
+bot.process_docs()
+
+bot.agent.run("Based on the documents, what is langchain")
+print(bot.lastSource)
+bot.agent.run("Based on the documents, what is happening in New York City?")
+print(bot.lastSource)
+bot.agent.run("Based on the documents, what is langchain named after?")
+print(bot.lastSource)
+bot.agent.run("Based on the documents, what are the prerequisites for CS 589?")
+print(bot.lastSource)
+bot.agent.run("Based on the documents, who is the president of United States?")
+print(bot.lastSource)
+bot.agent.run("Based on the documents, what did Xingyu do in the arduino project?")
+print(bot.lastSource)
 
 # PATH_TO_TESTING_CSV = "testing_suite/testing_results.csv"
 

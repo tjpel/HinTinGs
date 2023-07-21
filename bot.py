@@ -11,10 +11,10 @@ from langchain.document_loaders import DirectoryLoader
 from nemoguardrails import LLMRails, RailsConfig
 from nemoguardrails.actions import action
 from gradio_tools.tools import StableDiffusionTool
-from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
 from langchain.schema import HumanMessage
 
 load_dotenv()
+
 
 class Bot:
     def __init__(self, files_path: str, config_path: str = "config/base"):
@@ -42,10 +42,6 @@ class Bot:
 
         self.lastSource = None
 
-        # Initialize the model and tokenizer
-        self.model = AutoModelForSeq2SeqLM.from_pretrained("google/flan-t5-base")
-        self.tokenizer = AutoTokenizer.from_pretrained("google/flan-t5-base")
-
     @action()
     async def query_base_chain(self, q: str):
         res = self.qa({"query": q})
@@ -61,33 +57,30 @@ class Bot:
         self.documents = self.loader.load()
 
     def run_qa(self, q: str):
-        # ans = self.app.generate(q)
-        # res = f"Answer: {ans}\nSource: {self.lastSource}\n"
-        # return res
-        output = self.qa({"query": q})
-        hintings = output['result']
+        # run the QA system
+        hintings = self.app.generate(q)
 
         prompt = f"""Giving just yes or no as an answer. Answer no if the response states there is no
         context or I don't know. Otherwise, answer yes.
     
         response: {hintings}"""
 
-        print("question:", q)
-        print("hintings: ", hintings)
-        print("\n")
+        # print("question:", q)
+        # print("hintings: ", hintings)
+        # print("\n")
         res = self.app.llm([HumanMessage(content=prompt)]).content
-        print("res: ", res)
+        # print("context: ", res)
 
         # if there is no context, we run a web search
-        if res.lower() == 'no':
-            print("There is no answer found in the documents. Here is some information from the web:")
-            search = SerpAPIWrapper()
+        if res.lower() == "no":
+            print(
+                "There is no answer found in the documents. Here is some information from the web:"
+            )
             self.lastSource = "web search, no info from documents"
-            return search.run(q)
+            return self.search.run(q)
         else:
-            print('Found in uploaded documents:')
+            print("Found in uploaded documents:")
             return hintings
-
 
     def run_serpapi(self, q: str) -> str:
         res = self.search.run(q)
@@ -148,21 +141,3 @@ class Bot:
         self.agent = initialize_agent(
             tools, self.app.llm, agent=AgentType.OPENAI_FUNCTIONS, verbose=True
         )
-
-
-
-bot = Bot("data")
-bot.load_docs()
-bot.process_docs()
-bot.agent.run("Based on the documents, what is langchain")
-print(bot.lastSource)
-bot.agent.run("Based on the documents, what is happening in New York City?")
-print(bot.lastSource)
-bot.agent.run("Based on the documents, what is langchain named after?")
-print(bot.lastSource)
-bot.agent.run("Based on the documents, what are the prerequisites for CS 589?")
-print(bot.lastSource)
-bot.agent.run("Based on the documents, who is the president of United States?")
-print(bot.lastSource)
-bot.agent.run("Based on the documents, what did Xingyu do in the arduino project?")
-print(bot.lastSource)
