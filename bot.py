@@ -1,10 +1,9 @@
 from langchain.chains import RetrievalQA
 from dotenv import load_dotenv
-from langchain import LLMMathChain, SerpAPIWrapper, OpenAI, SQLDatabase, SQLDatabaseChain
+from langchain import LLMMathChain, SerpAPIWrapper
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.vectorstores import Chroma
 from langchain.text_splitter import CharacterTextSplitter
-from langchain.memory import ConversationBufferWindowMemory
 from langchain.document_loaders import DirectoryLoader
 from langchain.agents import initialize_agent, Tool
 from langchain.agents import AgentType
@@ -13,6 +12,7 @@ from nemoguardrails import LLMRails, RailsConfig
 from nemoguardrails.actions import action
 from gradio_tools.tools import StableDiffusionTool
 from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
+from langchain.schema import HumanMessage
 
 load_dotenv()
 
@@ -40,11 +40,6 @@ class Bot:
         self.llm_math_chain = LLMMathChain.from_llm(self.app.llm, verbose=True)
         self.agent = None
 
-        # create a memory object, which tracks the conversation history
-        # self.memory = ConversationBufferWindowMemory(
-        #     k=3, memory_key="chat_history", return_messages=True
-        # )
-
         self.lastSource = None
 
         # Initialize the model and tokenizer
@@ -71,21 +66,20 @@ class Bot:
         # return res
         output = self.qa({"query": q})
         hintings = output['result']
-        source = output['source_documents'][0].page_content
 
-        prompt = f"""
-                Giving just yes or no as an answer, is the information in phrase #2 sourced from phrase #1? Meaning is phrase #2 a paraphrase of phrase #1?
+        prompt = f"""Giving just yes or no as an answer. Answer no if the response states there is no
+        context or I don't know. Otherwise, answer yes.
+    
+        response: {hintings}"""
 
-                Phrase #1: {source}
-                Phrase #2: {hintings}
-                """
-
-        inputs = self.tokenizer(prompt, return_tensors="pt")
-        outputs = self.model.generate(**inputs, max_length=3)
-        res = self.tokenizer.batch_decode(outputs, skip_special_tokens=True)
+        print("question:", q)
+        print("hintings: ", hintings)
+        print("\n")
+        res = self.app.llm([HumanMessage(content=prompt)]).content
+        print("res: ", res)
 
         # if there is no context, we run a web search
-        if res == ['no']:
+        if res.lower() == 'no':
             print("There is no answer found in the documents. Here is some information from the web:")
             search = SerpAPIWrapper()
             self.lastSource = "web search, no info from documents"
@@ -156,27 +150,19 @@ class Bot:
         )
 
 
-"""
-    def clear_memory(self):
-        # creates the a new chain, but still has access to the pre-computed embeddings
-        self.memory = ConversationBufferWindowMemory(k=3, memory_key="chat_history", return_messages=True)
-        self.qa = ConversationalRetrievalChain.from_llm(
-            llm=self.app.llm,
-            retriever=self.docsearch.as_retriever(search_kwargs={"k": 2}),
-            chain_type="stuff",
-            # verbose=True,
-            memory=self.memory,
-        )
-"""
 
-# bot = Bot("../data")
-# bot.load_docs()
-# bot.process_docs()
-# bot.agent.run("Based on the documents, what is langchain")
-# print(bot.lastSource)
-# bot.agent.run("Based on the documents, what is happening in NYC?")
-# print(bot.lastSource)
-# bot.agent.run("What is the weather at Reading Massachusetts?")
-# print(bot.lastSource)
-# bot.agent.run("Create a cute picture of a raccoon, digital art")
-# print(bot.lastSource)
+bot = Bot("data")
+bot.load_docs()
+bot.process_docs()
+bot.agent.run("Based on the documents, what is langchain")
+print(bot.lastSource)
+bot.agent.run("Based on the documents, what is happening in New York City?")
+print(bot.lastSource)
+bot.agent.run("Based on the documents, what is langchain named after?")
+print(bot.lastSource)
+bot.agent.run("Based on the documents, what are the prerequisites for CS 589?")
+print(bot.lastSource)
+bot.agent.run("Based on the documents, who is the president of United States?")
+print(bot.lastSource)
+bot.agent.run("Based on the documents, what did Xingyu do in the arduino project?")
+print(bot.lastSource)
