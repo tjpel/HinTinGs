@@ -20,7 +20,7 @@ load_dotenv()
 
 
 class Bot:
-    def __init__(self, files_path: str, config_path: str = "config/base"):
+    def __init__(self, files_path: str, config_path: str = "config\base"):
         """
         The constructor method for the Bot class takes a file path as input and initializes the class by loading and splitting the text using the TextLoader and CharacterTextSplitter
         classes. It also turns the text into embeddings and creates a Chroma vector database using OpenAIEmbeddings and Chroma. Finally, it sets up the RetrievalQA class using a GPT-3
