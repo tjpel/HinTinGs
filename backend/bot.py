@@ -1,15 +1,14 @@
 from dotenv import load_dotenv
-
 from langchain import LLMMathChain, SerpAPIWrapper
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.vectorstores import Chroma
 from langchain.text_splitter import CharacterTextSplitter
 from langchain.chains import RetrievalQA
-from langchain.memory import ConversationBufferWindowMemory
 from langchain.document_loaders import DirectoryLoader
 from langchain.agents import initialize_agent, Tool
 from langchain.agents import AgentType
 from langchain.chat_models import ChatOpenAI
+from langchain.schema import HumanMessage
 from nemoguardrails import LLMRails, RailsConfig
 from nemoguardrails.actions import action, fact_checking, hallucination
 from gradio_tools.tools import StableDiffusionTool
@@ -38,18 +37,15 @@ class Bot:
         # initialize NeMo App
         self.app = LLMRails(config)
 
-        # initilize search
+        # initialize search
         self.search = SerpAPIWrapper()
 
-        # initilize math chain
+        # initialize math chain
         self.llm_math_chain = LLMMathChain.from_llm(self.app.llm, verbose=True)
-
-        # create a memory object, which tracks the conversation history
-        # self.memory = ConversationBufferWindowMemory(
-        #     k=3, memory_key="chat_history", return_messages=True
-        # )
-
         self.lastSource = None
+
+        # initialize LLM for determining whether web search is needed
+        self.llm = ChatOpenAI(temperature=0)
 
     @action()
     async def query_base_chain(self, q: str):
@@ -58,9 +54,14 @@ class Bot:
         self.lastSource = res["source_documents"][0].metadata["source"]
         return answer
 
-    def query(self, q: str, openai_function=False) -> str:
+    def query(self, q: str, openai_function=False, qa_serpapi=False) -> str:
+        # use openai functions, notice this will also come with serpapi integration for QA
         if openai_function:
             return self.agent.run(q)
+        # serpapi integration for QA
+        if qa_serpapi:
+            return self.run_qa(q)
+        # regular QA
         else:
             return self.app.generate(q)
 
@@ -68,10 +69,27 @@ class Bot:
         self.loader = DirectoryLoader(self.files_path)
         self.documents = self.loader.load()
 
-    # def run_qa(self, q: str):
-    #     ans = self.app.generate(q)
-    #     res = f"Answer: {ans}\nSource: {self.lastSource}\n"
-    #     return res
+    # runs QA, if there is no context, we do a web search
+    def run_qa(self, q: str):
+        hintings = self.app.generate(q)
+
+        prompt = f"""Giving just yes or no as an answer. Answer no if the response states there is no
+        context, I don't know, no permissions , or a refusal to answer. Otherwise, answer yes.
+    
+        response: {hintings}"""
+
+        res = self.llm([HumanMessage(content=prompt)]).content
+
+        # if there is no context, we run a web search
+        if res.lower() == "no":
+            print(
+                "There is no answer found in the documents. Here is some information from the web:"
+            )
+            self.lastSource = "web search, no info from documents"
+            return self.search.run(q)
+        else:
+            print("Found in uploaded documents:")
+            return hintings
 
     def run_serpapi(self, q: str) -> str:
         res = self.search.run(q)
@@ -134,17 +152,3 @@ class Bot:
         self.agent = initialize_agent(
             tools, self.app.llm, agent=AgentType.OPENAI_FUNCTIONS, verbose=True
         )
-
-
-"""
-    def clear_memory(self):
-        # creates the a new chain, but still has access to the pre-computed embeddings
-        self.memory = ConversationBufferWindowMemory(k=3, memory_key="chat_history", return_messages=True)
-        self.qa = ConversationalRetrievalChain.from_llm(
-            llm=self.app.llm,
-            retriever=self.docsearch.as_retriever(search_kwargs={"k": 2}),
-            chain_type="stuff",
-            # verbose=True,
-            memory=self.memory,
-        )
-"""
