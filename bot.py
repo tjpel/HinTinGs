@@ -61,7 +61,7 @@ class Bot:
         hintings = self.app.generate(q)
 
         prompt = f"""Giving just yes or no as an answer. Answer no if the response states there is no
-        context or I don't know. Otherwise, answer yes.
+        context, I don't know, no permissions to access, or a refusal to answer. Otherwise, answer yes.
     
         response: {hintings}"""
 

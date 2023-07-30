@@ -1,6 +1,7 @@
 from bot import Bot
 import pandas as pd
-#from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
+
+# from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
 from sentence_transformers import SentenceTransformer, util
 import time
 import sys
@@ -24,7 +25,8 @@ bot.agent.run("Based on the documents, who is the president of United States?")
 print(bot.lastSource)
 bot.agent.run("Based on the documents, what did Xingyu do in the arduino project?")
 print(bot.lastSource)
-
+bot.agent.run("Based on the documents, what is the best ice cream flavor?")
+print(bot.lastSource)
 # PATH_TO_TESTING_CSV = "testing_suite/testing_results.csv"
 
 # # LIMIT_QUESTIONS limits the amount of questions asked to MAX_QUESTIONS_TO_TEST. If you enable LIMIT_QUESTIONS, your results will not be saved to PATH_TO_TRAINING_CSV.
