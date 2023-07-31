@@ -163,4 +163,4 @@ cython_debug/
 .history
 .chroma 
 
-backend/files/
+files/
