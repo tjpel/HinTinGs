@@ -4,17 +4,20 @@ import Overlay from "../components/overlay";
 import { protectedFetch, API_URL } from '../utils/fetch';
 import UploadDarkIcon from '../assets/upload_dark.svg';
 import IngestIcon from '../assets/ingest.svg';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import s from '../styles/index.module.scss';
+import { faX } from '@fortawesome/free-solid-svg-icons';
 import Loading from "../components/loading";
 
 type Props = {
 	show: boolean,
 	onUploadSuccess: (files: File[]) => void
+	exitUploadOverlay: () => void
 };
 
 const ALLOWED_FILES = ['text/plain', 'text/markdown', 'application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/vnd.oasis.opendocument.text', 'application/rtf', 'application/epub+zip', 'application/x-fictionbook+xml', 'application/x-mobipocket-ebook', 'application/x-latex', 'application/x-tex'];
 
-function UploadOverlay({ show, onUploadSuccess }: Props) {
+function UploadOverlay({ show, onUploadSuccess, exitUploadOverlay }: Props) {
 	const [files, setFiles] = useState<File[]>([]);
 	const [processingUpload, setProcessingUpload] = useState(false);
 
@@ -42,7 +45,7 @@ function UploadOverlay({ show, onUploadSuccess }: Props) {
 	const onUploadFiles = () => {
 		setProcessingUpload(true);
 		const url = API_URL + '/documents/';
-		console.log(url);
+		// console.log(url);
 		const form = new FormData();
 		for (let i = 0; i < files.length; i++) {
 			form.append('files', files[i]);
@@ -51,8 +54,8 @@ function UploadOverlay({ show, onUploadSuccess }: Props) {
 			method: 'POST',
 			body: form
 		};
-		console.log('Uploading files to server');
-		console.log(files);		
+		// console.log('Uploading files to server');
+		// console.log(files);		
 		protectedFetch(url, options).then(() => {
 			onUploadSuccess(files);
 			setFiles([]);
@@ -84,6 +87,15 @@ function UploadOverlay({ show, onUploadSuccess }: Props) {
 					<img className='inline-block w-5 h-5' src={UploadDarkIcon} alt="Upload icon" />
 				</Button>
 			</label>
+			<Button 
+					bg='green'
+					className='absolute top-2 right-2 w-8 h-8 text-white rounded-full pt-[0.1rem]'
+					onClick={() => {
+						console.log("i pressed the hide this button");
+						exitUploadOverlay();
+					}}>
+					<FontAwesomeIcon icon={faX} />
+				</Button>
 			<input 
 				ref={FileInput}
 				className='hidden' type="file" name="document-upload" id="document-upload" 

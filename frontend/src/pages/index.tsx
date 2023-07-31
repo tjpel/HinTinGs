@@ -204,10 +204,13 @@ function IndexPage() {
 		<main className='pt-10 sm:pt-20 relative'>
 			<div className='container mx-auto px-5 max-w-xl'>
 				{mainContent}
-				<UploadOverlay show={showUploadOverlay} onUploadSuccess={files => {
-					setUploadedFiles(files);
-					setShowUploadOverlay(false);
-				}} />
+				<UploadOverlay show={showUploadOverlay} 
+					onUploadSuccess={files => {
+						setUploadedFiles(files);
+						setShowUploadOverlay(false);
+					}} 
+					exitUploadOverlay={() => setShowUploadOverlay(false)}
+				/>
 				<SourceDocOverlay 
 					show={showSourceOverlay}
 					source={viewedSource}
