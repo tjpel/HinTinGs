@@ -19,7 +19,7 @@ load_dotenv()
 
 
 class Bot:
-    def __init__(self, files_path: str, config_path: str = "config\base"):
+    def __init__(self, files_path: str, config_path: str = "config/base"):
         """
         The constructor method for the Bot class takes a file path as input and initializes the class by loading and splitting the text using the TextLoader and CharacterTextSplitter
         classes. It also turns the text into embeddings and creates a Chroma vector database using OpenAIEmbeddings and Chroma. Finally, it sets up the RetrievalQA class using a GPT-3
@@ -54,7 +54,7 @@ class Bot:
         self.lastSource = res["source_documents"][0].metadata["source"]
         return answer
 
-    def query(self, q: str, openai_function=False, qa_serpapi=False) -> str:
+    def query(self, q: str, openai_function=False, qa_serpapi=True) -> str:
         # use openai functions, notice this will also come with serpapi integration for QA
         if openai_function:
             return self.agent.run(q)
@@ -73,7 +73,7 @@ class Bot:
     def run_qa(self, q: str):
         hintings = self.app.generate(q)
 
-        prompt = f"""Giving just yes or no as an answer. Answer no if the response states there is no
+        prompt = f"""Giving just yes or no as an answer. Answer no if the response states there is not enough
         context, I don't know, no permissions , or a refusal to answer. Otherwise, answer yes.
     
         response: {hintings}"""
