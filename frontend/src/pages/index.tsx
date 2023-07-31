@@ -10,6 +10,7 @@ import UploadOverlay from './upload';
 import { API_URL, protectedFetch } from '../utils/fetch';
 import Loading from '../components/loading';
 import SourceDocOverlay from './source';
+import Switch from 'react-switch';
 
 export type Source = {
 	name: string,
@@ -30,6 +31,7 @@ function IndexPage() {
 	const [processingAnswer, setProcessingAnswer] = useState(false);
 	const [showUploadOverlay, setShowUploadOverlay] = useState(false);
 	const [showSourceOverlay, setShowSourceOverlay] = useState(false);
+	const [openai, setOpenAIFunction] = useState(false);
 	const [viewedSource, setViewedSource] = useState<Source>();
 
 	// useEffect(() => {
@@ -50,6 +52,10 @@ function IndexPage() {
 		onQuestionAsked();
 	}
 
+	const switchFlip = (openai) => {
+		setOpenAIFunction(openai);
+	}
+
 	const onQuestionAsked = () => {
 		//console.log("Asking question " + question)
 		setProcessingAnswer(true);
@@ -57,7 +63,8 @@ function IndexPage() {
 		const options = {
 			method: 'POST',
 			body: JSON.stringify({
-				question
+				question,
+				openai
 			}),
 			headers: {
 				'Content-Type': 'application/json'
@@ -162,6 +169,7 @@ function IndexPage() {
 					}}>
 					<FontAwesomeIcon icon={faArrowRight} />
 				</Button>
+				<Switch onChange={switchFlip} checked={openai} />
 			</form>
 			{
 				answer ?
