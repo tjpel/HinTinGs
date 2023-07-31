@@ -105,6 +105,10 @@ def documents():
 
 
 if __name__ == "__main__":
+    # create files folder it doesn't exist
+    if not os.path.exists("files"):
+        os.makedirs("files")
+
     clear_files()
 
     hintings = bot.Bot("files")

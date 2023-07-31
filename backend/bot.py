@@ -54,7 +54,7 @@ class Bot:
         self.lastSource = res["source_documents"][0].metadata["source"]
         return answer
 
-    def query(self, q: str, openai_function=False, qa_serpapi=True) -> str:
+    def query(self, q: str, openai_function=False, qa_serpapi=False) -> str:
         # use openai functions, notice this will also come with serpapi integration for QA
         if openai_function:
             return self.agent.run(q)
