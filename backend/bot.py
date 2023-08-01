@@ -45,7 +45,7 @@ class Bot:
         self.lastSource = None
 
         # initialize LLM for determining whether web search is needed
-        self.llm = ChatOpenAI(temperature=0)
+        self.llm = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0)
 
     @action()
     async def query_base_chain(self, q: str):
@@ -55,15 +55,15 @@ class Bot:
         return answer
 
     def query(self, q: str, mode=1) -> str:
-            # QA
-            if mode == 1:
-                return self.app.generate(q)
-            # serpapi integration for QA
-            if mode == 2:
-                return self.run_qa(q)
-            # OpenAI functions
-            else:
-                return self.agent.run(q)
+        # QA
+        if mode == 1:
+            return self.app.generate(q)
+        # serpapi integration for QA
+        if mode == 2:
+            return self.run_qa(q)
+        # OpenAI functions
+        else:
+            return self.agent.run(q)
 
     def load_docs(self):
         self.loader = DirectoryLoader(self.files_path)

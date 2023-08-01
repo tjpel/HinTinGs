@@ -109,6 +109,6 @@ if __name__ == "__main__":
         os.makedirs("files")
 
     clear_files()
-    
-    hintings = bot.Bot('files')
+
+    hintings = bot.Bot("files")
     app.run(debug=True)
