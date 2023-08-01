@@ -43,6 +43,7 @@ class Bot:
         # initialize math chain
         self.llm_math_chain = LLMMathChain.from_llm(self.app.llm, verbose=True)
         self.lastSource = None
+        self.snippet = None
 
         # initialize LLM for determining whether web search is needed
         self.llm = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0)
@@ -52,6 +53,7 @@ class Bot:
         res = self.qa({"query": q})
         answer = res["result"]
         self.lastSource = res["source_documents"][0].metadata["source"]
+        self.snippet = res["source_documents"][0].page_content
         return answer
 
     def query(self, q: str, mode=1) -> str:

@@ -10,6 +10,7 @@ import UploadOverlay from './upload';
 import { API_URL, protectedFetch } from '../utils/fetch';
 import Loading from '../components/loading';
 import SourceDocOverlay from './source';
+import { Tooltip } from 'react-tooltip';
 import Switch from 'react-switch';
 
 export type Source = {
@@ -117,8 +118,11 @@ function IndexPage() {
 					setShowSourceOverlay(true);
 				}}
 			>
-				<img className='inline-block w-5 h-5 mr-3' src={CiteIcon} alt="Cite source" />
-				<button className='hover:text-gray-500'>{src.name}</button>
+				<img className='inline-block w-5 h-5 mr-3' style={{fill:"#FFFFFF"}} src={CiteIcon} alt="Cite source" />
+				
+				<a className='hover:text-gray-500' data-tooltip-id="source" data-tooltip-content={src.extract}>{src.name}</a>
+				<Tooltip id="source" html={src.extract} />
+		
 			</li>
 		));
 	}
@@ -179,6 +183,8 @@ function IndexPage() {
 					}}>
 					<FontAwesomeIcon icon={faArrowRight} />
 				</Button>
+				<br/>
+				<br/>
 				<label >
 					<span className="text-white">Q/A WITH SerpAPI        </span>
 				<Switch onChange={switchFlipS} checked={serpapi} />

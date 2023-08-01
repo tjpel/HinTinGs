@@ -69,15 +69,18 @@ def query():
 
         source_list = []
         if hintings.lastSource:
+            extract = hintings.snippet
+            extract = extract.replace("\n\n", "<br/>")
             source_list.append(
                 {
                     "name": hintings.lastSource,
                     "id": 0,
-                    "extract": "this is totally text from the source",
+                    "extract": extract,
                 }
             )
             hintings.lastSource = None
-
+            hintings.snippet = None
+        print("Sources: ", source_list)
         return make_response(
             jsonify(question=question, answer=answer, sources=source_list, status=200)
         )

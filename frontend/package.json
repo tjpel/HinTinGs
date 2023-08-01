@@ -18,7 +18,8 @@
         "dotenv": "^16.1.4",
         "react": "^18.2.0",
         "react-dom": "^18.2.0",
-        "react-switch": "^7.0.0"
+        "react-switch": "^7.0.0",
+        "react-tooltip": "^5.19.0"
     },
     "devDependencies": {
         "@types/node": "^20.4.2",
