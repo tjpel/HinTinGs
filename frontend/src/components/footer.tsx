@@ -17,9 +17,8 @@ function Footer() {
 						src="/hintings_logo_green.png" 
 						alt="hintings logo" 
 					/>
-					<Link className='inline-block mr-5' href='#' text='privacy policy' />
-					<Link className='inline-block mr-5' href='#' text='about' />
-					<Link className='inline-block' href='#' text='contact us' />
+					<Link className='inline-block mr-5' href='https://github.com/tjpel/HinTinGs' text='github' />
+					<Link className='inline-block mr-5' href='#' text='demo time!' />
 				</div>
 			</div>
 		</div>

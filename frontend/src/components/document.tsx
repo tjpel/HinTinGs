@@ -21,12 +21,6 @@ function Document({ name, className, ext }: Props) {
 			>
 				{name}
 			</p>
-			<Button 
-				bg="orange" 
-				className='w-6 h-6 rounded-full align-middle inline-flex flex-row justify-center items-center' 
-			>
-				<img className='inline-block w-4 h-4' src={TrashIcon} alt="Remove document" />
-			</Button>
 		</div>
 	);
 }

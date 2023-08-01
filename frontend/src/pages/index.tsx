@@ -145,6 +145,7 @@ function IndexPage() {
 		</>);
 	} else if (!processingAnswer) {
 		mainContent = (<>
+
 			<h1 className='text-4xl text-center mb-5'>
 				<img className='inline-block w-14 h-14' src='/hintings_logo_green.png' alt='hintings logo' />{' '}
 				hintings
@@ -160,7 +161,7 @@ function IndexPage() {
 					<Button 
 						className='text-white px-5 py-2 rounded-full ml-auto xl:mx-auto block' bg='green'
 						onClick={() => setShowUploadOverlay(true)}
-					>
+						>
 						upload{' '}
 						<img className='inline-block w-5 h-5' src={UploadIcon} alt="Upload icon" />
 					</Button>
@@ -173,7 +174,7 @@ function IndexPage() {
 					value={question}
 					onChange={e => setQuestion(e.target.value)}
 					type="text" 
-				/>
+					/>
 				<Button 
 					bg='green'
 					className='absolute top-2 right-2 w-8 h-8 text-white rounded-full pt-[0.1rem]'
@@ -195,9 +196,11 @@ function IndexPage() {
 					<Switch onChange={switchFlipOAI} checked={openai} />
 				</label>
 			</form>
+			<div className="max-h-[80vh] overflow-y-auto">
+
 			{
 				answer ?
-					<div>
+				<div>
 						<div className='mb-14'>
 							<h4 className='mb-2 text-2xl font-bold text-white'>{answer.question}</h4>
 							<p>{answer.answer}</p>
@@ -214,7 +217,9 @@ function IndexPage() {
 					</div>
 					:
 					null
-			}
+				}
+		</div>
+				
 		</>);
 	} else {
 		mainContent = (<>
