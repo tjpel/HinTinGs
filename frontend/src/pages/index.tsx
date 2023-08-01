@@ -32,6 +32,7 @@ function IndexPage() {
 	const [showUploadOverlay, setShowUploadOverlay] = useState(false);
 	const [showSourceOverlay, setShowSourceOverlay] = useState(false);
 	const [openai, setOpenAIFunction] = useState(false);
+	const [serpapi, setSerpapiFunction] = useState(false);
 	const [viewedSource, setViewedSource] = useState<Source>();
 
 	// useEffect(() => {
@@ -52,8 +53,17 @@ function IndexPage() {
 		onQuestionAsked();
 	}
 
-	const switchFlip = (openai) => {
+	const switchFlipOAI = (openai) => {
+		if (serpapi && openai) {
+			setSerpapiFunction(false);
+		}
 		setOpenAIFunction(openai);
+	}
+	const switchFlipS = (serpapi) => {
+		if (openai && serpapi) {
+			setOpenAIFunction(false);
+		}
+		setSerpapiFunction(serpapi);
 	}
 
 	const onQuestionAsked = () => {
@@ -64,7 +74,7 @@ function IndexPage() {
 			method: 'POST',
 			body: JSON.stringify({
 				question,
-				openai
+				openai: (openai ? 3 : (serpapi ? 2 : 1))
 			}),
 			headers: {
 				'Content-Type': 'application/json'
@@ -169,7 +179,15 @@ function IndexPage() {
 					}}>
 					<FontAwesomeIcon icon={faArrowRight} />
 				</Button>
-				<Switch onChange={switchFlip} checked={openai} />
+				<label >
+					<span className="text-white">Q/A WITH SerpAPI        </span>
+				<Switch onChange={switchFlipS} checked={serpapi} />
+				</label>
+				<br></br>
+				<label>
+					<span className="text-white">OpenAI Functions        </span>
+					<Switch onChange={switchFlipOAI} checked={openai} />
+				</label>
 			</form>
 			{
 				answer ?

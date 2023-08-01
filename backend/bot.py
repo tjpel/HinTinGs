@@ -54,16 +54,16 @@ class Bot:
         self.lastSource = res["source_documents"][0].metadata["source"]
         return answer
 
-    def query(self, q: str, openai_function=False, qa_serpapi=False) -> str:
-        # use openai functions, notice this will also come with serpapi integration for QA
-        if openai_function:
-            return self.agent.run(q)
-        # serpapi integration for QA
-        if qa_serpapi:
-            return self.run_qa(q)
-        # regular QA
-        else:
-            return self.app.generate(q)
+    def query(self, q: str, mode=1) -> str:
+            # QA
+            if mode == 1:
+                return self.app.generate(q)
+            # serpapi integration for QA
+            if mode == 2:
+                return self.run_qa(q)
+            # OpenAI functions
+            else:
+                return self.agent.run(q)
 
     def load_docs(self):
         self.loader = DirectoryLoader(self.files_path)

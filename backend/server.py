@@ -61,11 +61,11 @@ def query():
     if request.method == "POST":
         req = request.get_json()
         question = req['question'] # This is the question that the user asked in the form
-        print("Question: ", question)
-        print("Open AI: ", req['openai'])
-        # answer = hintings.query(question)
-        answer = "your question was not important so here\'s a random answer"
-        print("Answer: ", answer)
+        # print("Question: ", question)
+        # print("Open AI: ", req['openai'])
+        answer = hintings.query(question, mode=req['openai'])
+        # answer = "your question was not important so here\'s a random answer"
+        # print("Answer: ", answer)
 
         source_list = []
         if hintings.lastSource:
